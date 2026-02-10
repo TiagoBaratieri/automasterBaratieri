@@ -22,4 +22,8 @@ public class Veiculo {
     private String marca;
     private Integer ano;
 
+    @ManyToOne
+    @JoinColumn(name = "cliente_id", nullable = false)
+    private Cliente cliente;
+
 }
