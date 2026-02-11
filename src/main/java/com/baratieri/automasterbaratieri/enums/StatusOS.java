@@ -1,6 +1,8 @@
 package com.baratieri.automasterbaratieri.enums;
 
 
+import java.util.List;
+
 public enum StatusOS {
     // 1. O.S. criada, aguardando cliente autorizar
     ORCAMENTO,
@@ -17,7 +19,7 @@ public enum StatusOS {
     // 5. Cliente não aceitou o orçamento
     CANCELADO;
 
-    public boolean permiteEdicao() {
-        return this == ORCAMENTO || this == APROVADO || this == EM_EXECUCAO;
+    public static List<StatusOS> getAtivos() {
+        return List.of(ORCAMENTO, APROVADO, EM_EXECUCAO);
     }
 }

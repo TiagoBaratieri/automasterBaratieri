@@ -33,8 +33,10 @@ public class OrdemServico {
 
     private LocalDateTime dataFechamento;
 
-    @Column(precision = 10, scale = 2)
-    private BigDecimal valorTotal;
+    private String descricao;
+
+    @Column(name = "valor_total")
+    private BigDecimal valorTotal = BigDecimal.ZERO;
 
     @OneToMany(mappedBy = "ordemServico", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ItemPeca> itensPeca = new ArrayList<>();

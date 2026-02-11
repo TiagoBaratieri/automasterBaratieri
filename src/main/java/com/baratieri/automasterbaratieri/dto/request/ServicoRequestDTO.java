@@ -1,6 +1,5 @@
 package com.baratieri.automasterbaratieri.dto.request;
 
-import com.baratieri.automasterbaratieri.entities.Servico;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -14,12 +13,5 @@ public record ServicoRequestDTO(
         @NotNull(message = "O preço base é obrigatório")
         @PositiveOrZero(message = "O preço não pode ser negativo")
         BigDecimal valorMaoDeObraBase) {
-
-    public Servico toEntity() {
-        Servico servico = new Servico();
-        servico.setDescricao(descricao);
-        servico.setValorMaoDeObraBase(valorMaoDeObraBase);
-        return servico;
-    }
 
 }

@@ -38,6 +38,23 @@ public class Peca {
 
     private Integer estoqueMinimo = 5;
 
+    public void adicionarEstoque(Integer quantidade) {
+        if (quantidade < 0) {
+            throw new IllegalArgumentException("Quantidade deve ser positiva.");
+        }
+        this.quantidadeEstoque+= quantidade;
+    }
+
+    public void baixarEstoque(Integer quantidade) {
+        if (quantidade < 0) {
+            throw new IllegalArgumentException("Quantidade deve ser positiva.");
+        }
+        this.quantidadeEstoque -= quantidade;
+    }
+
+    public boolean precisaReporEstoque() {
+        return this.quantidadeEstoque <= this.estoqueMinimo;
+    }
     @Version
     private Long version;
 }

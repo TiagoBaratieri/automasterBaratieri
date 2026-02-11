@@ -1,5 +1,6 @@
 package com.baratieri.automasterbaratieri.dto.request;
 
+import com.baratieri.automasterbaratieri.entities.Veiculo;
 import com.baratieri.automasterbaratieri.validation.Placa;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

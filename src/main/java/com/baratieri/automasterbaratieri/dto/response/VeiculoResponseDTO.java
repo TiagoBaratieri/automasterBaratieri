@@ -3,7 +3,7 @@ package com.baratieri.automasterbaratieri.dto.response;
 import com.baratieri.automasterbaratieri.entities.Veiculo;
 
 public record VeiculoResponseDTO (Long id,
-                                  String palca,
+                                  String placa,
                                   String modelo,
                                   String marca,
                                   Integer ano){
