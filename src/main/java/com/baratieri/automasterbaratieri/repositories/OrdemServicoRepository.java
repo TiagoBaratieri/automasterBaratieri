@@ -14,10 +14,5 @@ import java.util.List;
 @Repository
 public interface OrdemServicoRepository extends JpaRepository<com.baratieri.automasterbaratieri.entities.OrdemServico, Long> {
 
-    List<OrdemServico> findByStatus(StatusOS status);
-
-    // Histórico do Cliente: Ver tudo que aquele carro já fez
-    List<OrdemServico> findByVeiculoPlaca(String placa);
-
     boolean existsByVeiculoAndStatusIn(Veiculo veiculo, List<StatusOS> orcamento);
 }

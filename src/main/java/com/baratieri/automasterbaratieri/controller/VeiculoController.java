@@ -4,7 +4,7 @@ import com.baratieri.automasterbaratieri.dto.request.VeiculoRequestDTO;
 import com.baratieri.automasterbaratieri.dto.response.VeiculoResponseDTO;
 import com.baratieri.automasterbaratieri.services.VeiculoService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,10 +16,10 @@ import java.net.URI;
 
 @Controller
 @RequestMapping(value = "veiculos")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class VeiculoController {
 
-    private VeiculoService veiculoService;
+    private final VeiculoService veiculoService;
 
     @PostMapping
     public ResponseEntity<VeiculoResponseDTO> salvar(

@@ -5,6 +5,7 @@ import com.baratieri.automasterbaratieri.dto.response.ClienteResponseDTO;
 import com.baratieri.automasterbaratieri.services.ClienteService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,10 +17,10 @@ import java.net.URI;
 
 @Controller
 @RequestMapping(value = "/clientes")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ClienteController {
 
-    private ClienteService clienteService;
+    private final ClienteService clienteService;
 
     @PostMapping
     public ResponseEntity<ClienteResponseDTO> salvar(

@@ -42,7 +42,7 @@ public class Peca {
         if (quantidade < 0) {
             throw new IllegalArgumentException("Quantidade deve ser positiva.");
         }
-        this.quantidadeEstoque+= quantidade;
+        this.quantidadeEstoque += quantidade;
     }
 
     public void baixarEstoque(Integer quantidade) {
