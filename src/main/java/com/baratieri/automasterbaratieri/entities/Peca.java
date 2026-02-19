@@ -20,10 +20,16 @@ public class Peca {
     @Column(nullable = false, unique = true, length = 20)
     private String sku;
 
-    @Column(nullable = false)
     private String nome;
 
+    @Column(unique = true)
     private String partNumber;
+
+    @Column(nullable = false)
+    private String marca;
+
+    @Column(nullable = false)
+    private String aplicacao;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal precoVenda;

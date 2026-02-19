@@ -25,7 +25,7 @@ public class OrdemServicoController {
     public ResponseEntity<OrdemServicoResponseDTO> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(ordemServicoService.buscarPorId(id));
     }
-    
+
     @PostMapping
     public ResponseEntity<OrdemServicoResponseDTO> abrirOrdemServico(
             @RequestBody @Valid AberturaOsRequestDTO dto) {

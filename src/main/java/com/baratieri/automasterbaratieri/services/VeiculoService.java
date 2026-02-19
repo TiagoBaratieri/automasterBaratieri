@@ -6,6 +6,7 @@ import com.baratieri.automasterbaratieri.entities.Cliente;
 import com.baratieri.automasterbaratieri.entities.Veiculo;
 import com.baratieri.automasterbaratieri.repositories.ClienteRepository;
 import com.baratieri.automasterbaratieri.repositories.VeiculoRepository;
+import com.baratieri.automasterbaratieri.services.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class VeiculoService {
     public VeiculoResponseDTO salvar(VeiculoRequestDTO dto) {
 
         Cliente cliente = clienteRepository.findById(dto.idCliente())
-                .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado com ID: " + dto.idCliente()));
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado com ID: " + dto.idCliente()));
         Veiculo veiculo = new Veiculo();
 
         veiculo.setId(veiculo.getId());

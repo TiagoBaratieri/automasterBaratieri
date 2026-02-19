@@ -12,9 +12,7 @@ import java.util.Optional;
 @Repository
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 
-    Optional<Cliente> findByCpfOuCnpj(String cpfOuCnpj);
-
     List<Cliente> findByNomeIgnoreCaseContaining(String nome);
 
-    boolean existsByCpfOuCnpj(@NotBlank(message = "O CPF/CNPJ é obrigatório") @Pattern(regexp = "\\d{11}|\\d{14}", message = "CPF/CNPJ inválido (apenas números)") String clienteResponseDTO);
+    boolean existsByCpfOuCnpj(String cpf);
 }

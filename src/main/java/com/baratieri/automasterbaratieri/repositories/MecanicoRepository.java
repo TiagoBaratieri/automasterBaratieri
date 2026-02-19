@@ -7,6 +7,6 @@ import java.util.Optional;
 
 @Repository
 public interface MecanicoRepository extends JpaRepository<Mecanico, Long> {
-
+    boolean existsByCpf(String cpf);
     Optional<Mecanico> findByIdAndAtivoTrue(Long id);
 }

@@ -15,6 +15,12 @@ public record PecaRequestDTO(
         @NotBlank(message = "O Part Number (código do fabricante) é obrigatório")
         String partNumber,
 
+        @NotBlank(message = "A marca é obrigatória (Ex: Tecfil, Bosch)")
+        String marca,
+
+        @NotBlank(message = "A aplicação é obrigatória (Ex: Fiat Uno / Palio)")
+        String aplicacao,
+
         @NotNull(message = "O preço de venda é obrigatório")
         @Positive(message = "O preço de venda deve ser maior que zero")
         @Digits(integer = 10, fraction = 2, message = "Formato de preço inválido (máximo 10 dígitos e 2 casas decimais)")

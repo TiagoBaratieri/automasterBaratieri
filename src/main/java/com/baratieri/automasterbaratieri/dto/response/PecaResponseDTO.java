@@ -13,16 +13,19 @@ public record PecaResponseDTO(
         BigDecimal precoVenda,
         BigDecimal precoCusto,
         Integer quantidadeEstoque,
-        Integer estoqueMinimo) {
+        Integer estoqueMinimo,
+        String nomeCompleto) {
 
-        public static PecaResponseDTO fromEntity(Peca peca) {
-                if (peca == null) return null;
-                return new PecaResponseDTO(peca.getSku(),
-                        peca.getNome(),
-                        peca.getPartNumber(),
-                        peca.getPrecoVenda(),
-                        peca.getPrecoCusto(),
-                        peca.getQuantidadeEstoque(),
-                        peca.getEstoqueMinimo());
-        }
+    public static PecaResponseDTO fromEntity(Peca peca) {
+        if (peca == null) return null;
+        String nomeJunto = peca.getNome() + " " + peca.getMarca() + " - " + peca.getAplicacao();
+        return new PecaResponseDTO(peca.getSku(),
+                peca.getNome(),
+                peca.getPartNumber(),
+                peca.getPrecoVenda(),
+                peca.getPrecoCusto(),
+                peca.getQuantidadeEstoque(),
+                peca.getEstoqueMinimo(),
+                nomeJunto);
+    }
 }

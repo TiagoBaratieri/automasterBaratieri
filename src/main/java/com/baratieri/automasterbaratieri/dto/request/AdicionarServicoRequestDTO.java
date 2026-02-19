@@ -14,7 +14,7 @@ public record AdicionarServicoRequestDTO(
         @Positive(message = "A quantidade deve ser maior que zero")
         Integer quantidade,
 
-        // Pode ser nulo (usa o padrão), mas se vier, não pode ser negativo
+
         @PositiveOrZero(message = "O valor cobrado não pode ser negativo")
         BigDecimal valorCobrado,
 

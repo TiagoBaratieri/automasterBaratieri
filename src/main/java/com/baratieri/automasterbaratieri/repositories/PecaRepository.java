@@ -12,4 +12,8 @@ public interface PecaRepository extends JpaRepository<Peca, Long> {
     // Busca inteligente: Nome ou PartNumber (Para a barra de pesquisa geral)
     // Query: SELECT * FROM peca WHERE nome LIKE %x% OR part_number LIKE %x%
     List<Peca> findByNomeContainingIgnoreCaseOrPartNumberContainingIgnoreCase(String nome, String partNumber);
+
+    boolean existsBySku(String skuFormatado);
+
+    boolean existsByPartNumber(String partNumber);
 }

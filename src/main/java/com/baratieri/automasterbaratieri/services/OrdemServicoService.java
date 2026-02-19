@@ -7,9 +7,11 @@ import com.baratieri.automasterbaratieri.dto.response.OrdemServicoResponseDTO;
 import com.baratieri.automasterbaratieri.entities.*;
 import com.baratieri.automasterbaratieri.enums.StatusOS;
 import com.baratieri.automasterbaratieri.repositories.*;
+import com.baratieri.automasterbaratieri.services.exceptions.RegraNegocioException;
+import com.baratieri.automasterbaratieri.services.exceptions.ResourceNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.AllArgsConstructor;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,23 +20,23 @@ import java.time.LocalDateTime;
 
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class OrdemServicoService {
 
-    private ItemServicoRepository itemServicoRepository;
-    private OrdemServicoRepository ordemServicoRepository;
-    private MecanicoRepository mecanicoRepository;
-    private VeiculoRepository veiculoRepository;
-    private ServicoRepository servicoRepository;
-    private ItemPecaRepository itemPecaRepository;
-    private PecaRepository pecaRepository;
+    private final ItemServicoRepository itemServicoRepository;
+    private final OrdemServicoRepository ordemServicoRepository;
+    private final MecanicoRepository mecanicoRepository;
+    private final VeiculoRepository veiculoRepository;
+    private final ServicoRepository servicoRepository;
+    private final ItemPecaRepository itemPecaRepository;
+    private final PecaRepository pecaRepository;
 
 
 
     @Transactional(readOnly = true)
     public OrdemServicoResponseDTO buscarPorId(Long id) {
         OrdemServico os = ordemServicoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("OS não encontrada com ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("OS não encontrada com ID: " + id));
 
         return OrdemServicoResponseDTO.fromEntity(os);
     }
@@ -42,7 +44,7 @@ public class OrdemServicoService {
     public OrdemServicoResponseDTO abrirOdemServico(AberturaOsRequestDTO dto) {
 
         Veiculo veiculo = veiculoRepository.findByPlaca(dto.placaVeiculo())
-                .orElseThrow(() -> new EntityNotFoundException("Veículo não encontrado com a placa: " +
+                .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado com a placa: " +
                         dto.placaVeiculo()));
 
         validarOsAberta(veiculo);
@@ -60,13 +62,13 @@ public class OrdemServicoService {
     @Transactional
     public OrdemServicoResponseDTO lancarServico(ItemServicoRequestDTO dto) {
         OrdemServico os = ordemServicoRepository.findById(dto.ordemServicoId())
-                .orElseThrow(() -> new EntityNotFoundException("OS não encontrada: " + dto.ordemServicoId()));
+                .orElseThrow(() -> new ResourceNotFoundException("OS não encontrada: " + dto.ordemServicoId()));
 
         Servico servico = servicoRepository.findById(dto.servicoId())
-                .orElseThrow(() -> new EntityNotFoundException("Serviço não encontrado no catálogo com ID: " + dto.servicoId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Serviço não encontrado no catálogo com ID: " + dto.servicoId()));
 
         Mecanico mecanico = mecanicoRepository.findByIdAndAtivoTrue(dto.mecanicoId())
-                .orElseThrow(() -> new EntityNotFoundException("Mecânico não encontrado ou Inativo. Verifique se o cadastro está ativo."
+                .orElseThrow(() -> new ResourceNotFoundException("Mecânico não encontrado ou Inativo. Verifique se o cadastro está ativo."
                 ));
 
         ItemServico itemServico = new ItemServico();
@@ -90,9 +92,9 @@ public class OrdemServicoService {
     @Transactional
     public OrdemServicoResponseDTO adicionarPecaOrdemServico(ItemPecaRequestDTO dto) {
         OrdemServico os = ordemServicoRepository.findById(dto.ordemServicoId())
-                .orElseThrow(() -> new EntityNotFoundException("OS não encontrada."));
+                .orElseThrow(() -> new ResourceNotFoundException("OS não encontrada."));
         Peca peca = pecaRepository.findById(dto.pecaId())
-                .orElseThrow(() -> new EntityNotFoundException("Peça não encontrada."));
+                .orElseThrow(() -> new ResourceNotFoundException("Peça não encontrada."));
 
         peca.baixarEstoque(dto.quantidade());
 
@@ -121,7 +123,7 @@ public class OrdemServicoService {
         OrdemServico os = buscarOsPorId(id);
 
         if (os.getStatus() != StatusOS.ORCAMENTO ) {
-            throw new EntityNotFoundException("Essa OS não pode ser iniciada pois está: "
+            throw new RegraNegocioException("Essa OS não pode ser iniciada pois está: "
                     + os.getStatus());
         }
 
@@ -148,21 +150,21 @@ public class OrdemServicoService {
                 StatusOS.getAtivos());
 
         if (jaTemOsAberta) {
-            throw new EntityNotFoundException("Este veículo já possui uma Ordem de Serviço em andamento.");
+            throw new RegraNegocioException("Este veículo já possui uma Ordem de Serviço em andamento.");
         }
 
     }
 
     private void validaStatusOSFinalizada(OrdemServico os) {
         if (!StatusOS.EM_EXECUCAO.equals(os.getStatus())) {
-            throw new EntityNotFoundException("Não é possível finalizar uma O.S. com status " + os.getStatus() +
+            throw new RegraNegocioException("Não é possível finalizar uma O.S. com status " + os.getStatus() +
                     ". A O.S. precisa estar em EM_EXECUCAO.");
         }
     }
 
     private OrdemServico buscarOsPorId(Long id) {
         return ordemServicoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Ordem de Serviço não encontrada com ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Ordem de Serviço não encontrada com ID: " + id));
     }
 
 }

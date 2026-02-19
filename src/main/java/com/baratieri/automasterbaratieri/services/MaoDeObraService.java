@@ -4,10 +4,11 @@ import com.baratieri.automasterbaratieri.dto.request.ServicoRequestDTO;
 import com.baratieri.automasterbaratieri.dto.response.ServicoResponseDTO;
 import com.baratieri.automasterbaratieri.entities.Servico;
 import com.baratieri.automasterbaratieri.repositories.ServicoRepository;
+import com.baratieri.automasterbaratieri.services.exceptions.RegraNegocioException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.ResourceAccessException;
+
 
 @Service
 @AllArgsConstructor
@@ -18,7 +19,7 @@ public class MaoDeObraService {
     public ServicoResponseDTO salvar(ServicoRequestDTO dto) {
 
         if (servicoRepository.existsByDescricaoIgnoreCase(dto.descricao())) {
-            throw new ResourceAccessException("Já existe um serviço cadastrado com a descrição: " + dto.descricao());
+            throw new RegraNegocioException("Já existe um serviço cadastrado com a descrição: " + dto.descricao());
         }
 
         Servico servico = new Servico();
