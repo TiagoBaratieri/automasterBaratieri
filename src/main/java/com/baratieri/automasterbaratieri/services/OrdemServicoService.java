@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -40,6 +42,21 @@ public class OrdemServicoService {
 
         return OrdemServicoResponseDTO.fromEntity(os);
     }
+
+    @Transactional(readOnly = true)
+    public List<OrdemServicoResponseDTO> buscarTodosOrdemServico(String placa, StatusOS status) {
+
+        List<OrdemServico> ordemServicos = ordemServicoRepository.buscarOSComFiltros(placa, status);
+
+        if (ordemServicos.isEmpty()) {
+            throw new ResourceNotFoundException("Nenhuma Ordem de Serviço encontrada para os filtros informados.");
+        }
+
+        return ordemServicos.stream()
+                .map(OrdemServicoResponseDTO::fromEntity)
+                .toList();
+    }
+
     @Transactional
     public OrdemServicoResponseDTO abrirOdemServico(AberturaOsRequestDTO dto) {
 

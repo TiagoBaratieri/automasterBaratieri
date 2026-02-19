@@ -3,6 +3,7 @@ package com.baratieri.automasterbaratieri.controller;
 import com.baratieri.automasterbaratieri.dto.request.*;
 import com.baratieri.automasterbaratieri.dto.response.OrdemServicoResponseDTO;
 
+import com.baratieri.automasterbaratieri.enums.StatusOS;
 import com.baratieri.automasterbaratieri.services.OrdemServicoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/ordens-servico")
@@ -24,6 +27,18 @@ public class OrdemServicoController {
     @GetMapping("/{id}")
     public ResponseEntity<OrdemServicoResponseDTO> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(ordemServicoService.buscarPorId(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<OrdemServicoResponseDTO>> buscar(
+            @RequestParam(name = "placa", required = false) String placa,
+            @RequestParam(name = "status", required = false) StatusOS status) {
+
+        // DICA DE OURO: Coloque este print temporário aqui!
+        System.out.println("Placa que chegou no Controller: " + placa);
+
+        List<OrdemServicoResponseDTO> ordemServicos = ordemServicoService.buscarTodosOrdemServico(placa, status);
+        return ResponseEntity.ok(ordemServicos);
     }
 
     @PostMapping
@@ -70,6 +85,7 @@ public class OrdemServicoController {
 
         return ResponseEntity.ok(ordemServicoService.lancarServico(dtoInterno));
     }
+
     @PutMapping("/{id}/aprovar")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void aprovarOrcamento(@PathVariable Long id) {

@@ -10,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.Instant;
 
@@ -62,9 +63,27 @@ public class ResourceExceptionHandler {
         return ResponseEntity.status(status).body(error);
     }
 
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<StandardError> handleTypeMismatch(MethodArgumentTypeMismatchException e, HttpServletRequest request) {
+        String nomeParametro = e.getName();
+        Object valorDigitado = e.getValue();
+
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError error = StandardError.builder()
+        .timestamp(Instant.now())
+        .status(status.value())
+        .error("Parâmetro de URL inválido")
+        .message("O valor '" + valorDigitado + "' não é válido para o parâmetro '" + nomeParametro + "'.")
+
+           .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(status).body(error);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<StandardError> validation(MethodArgumentNotValidException e, HttpServletRequest request) {
-        HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY; // Código 422
+        HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
 
         ValidationError err = new ValidationError();
         err.setTimestamp(Instant.now());
