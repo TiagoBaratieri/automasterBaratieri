@@ -6,7 +6,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
 
-public record AdicionarPecaPayloadDTO(
+public record PecaPayloadDTO(
         @NotNull(message = "O ID da peça é obrigatório")
         Long pecaId,
 

@@ -1,6 +1,7 @@
 package com.baratieri.automasterbaratieri.entities;
 
 import com.baratieri.automasterbaratieri.enums.StatusOS;
+import com.baratieri.automasterbaratieri.services.exceptions.RegraNegocioException;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -44,6 +45,25 @@ public class OrdemServico {
     @OneToMany(mappedBy = "ordemServico", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ItemServico> itensServico = new ArrayList<>();
 
+
+    public OrdemServico(Veiculo veiculo, String descricao) {
+        this.veiculo = veiculo;
+        this.descricao = descricao;
+        this.dataAbertura = LocalDateTime.now();
+        this.status = StatusOS.ORCAMENTO;
+    }
+    public void adicionarItemOrdemServico(ItemPeca item) {
+        validarStatusOrdemServicoFinalizadaOuCancelada();
+        itensPeca.add(item);
+        calcularTotal();
+    }
+
+    public void adicionarItemMaoDeObra(ItemServico item) {
+        validarStatusOrdemServicoFinalizadaOuCancelada();
+        itensServico.add(item);
+        calcularTotal();
+    }
+
     public void calcularTotal() {
         BigDecimal totalPecas = BigDecimal.ZERO;
 
@@ -64,13 +84,53 @@ public class OrdemServico {
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
         }
 
-        // 3. Atualiza o atributo da própria classe
         this.valorTotal = totalPecas.add(totalServicos);
+    }
+
+    public void cancelarOs() {
+        if (status == StatusOS.FINALIZADO) {
+            throw new RegraNegocioException("Não é possível cancelar uma Ordem de Serviço que já está concluída.");
+        }
+        if (status == StatusOS.CANCELADO) {
+            throw new RegraNegocioException("Esta Ordem de Serviço já encontra-se cancelada.");
+        }
+        status = StatusOS.CANCELADO;
+        dataFechamento = LocalDateTime.now();
+    }
+
+    public void restornarPecasAoEstoque(){
+        if (itensPeca != null) {
+            itensPeca.forEach(item -> item.getPeca().adicionarEstoque(item.getQuantidade()));
+        }
+    }
+
+    public void aprovarOrcamento(){
+        if (status != StatusOS.ORCAMENTO) {
+            throw new RegraNegocioException("Essa OS não pode ser iniciada pois está: "
+                    + status);
+        }
+        status = StatusOS.EM_EXECUCAO;
+    }
+
+    public void finalizarOs() {
+        if (status != StatusOS.EM_EXECUCAO) {
+            throw new RegraNegocioException("Não é possível finalizar uma O.S. com status " + status +
+                    ". A O.S. precisa estar EM_EXECUCAO.");
+        }
+
+        status = StatusOS.FINALIZADO;
+        dataFechamento = LocalDateTime.now();
     }
 
     @PrePersist
     @PreUpdate
     public void garantirCalculoAntesDeSalvar() {
         this.calcularTotal();
+    }
+
+    private void validarStatusOrdemServicoFinalizadaOuCancelada() {
+        if (this.status == StatusOS.FINALIZADO || this.status == StatusOS.CANCELADO) {
+            throw new RegraNegocioException("Não é possível adicionar peças em uma OS encerrada.");
+        }
     }
 }

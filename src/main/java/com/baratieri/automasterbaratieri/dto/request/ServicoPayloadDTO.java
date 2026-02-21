@@ -6,7 +6,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
 
-public record AdicionarServicoPayloadDTO(
+public record ServicoPayloadDTO(
 
         @NotNull(message = "O ID do serviço é obrigatório")
         Long servicoId,

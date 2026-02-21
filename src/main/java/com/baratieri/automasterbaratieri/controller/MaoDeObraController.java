@@ -22,8 +22,9 @@ public class MaoDeObraController {
     private final MaoDeObraService maoDeObraService;
 
     @PostMapping
-    public ResponseEntity<ServicoResponseDTO> salvar(@Valid @RequestBody  ServicoRequestDTO dto,
-                                                        UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<ServicoResponseDTO> salvar(@RequestBody @Valid
+                                                     ServicoRequestDTO dto,
+                                                     UriComponentsBuilder uriBuilder) {
 
         ServicoResponseDTO servicoDto = maoDeObraService.salvar(dto);
 

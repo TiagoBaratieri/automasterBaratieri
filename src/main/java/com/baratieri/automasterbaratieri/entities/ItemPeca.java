@@ -1,5 +1,6 @@
 package com.baratieri.automasterbaratieri.entities;
 
+import com.baratieri.automasterbaratieri.dto.request.ItemPecaRequestDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,6 +35,14 @@ public class ItemPeca {
     @Column(name = "preco_unitario", nullable = false, precision = 10, scale = 2)
     private BigDecimal precoUnitario;
 
+    public ItemPeca(OrdemServico ordemServico, Peca peca,
+                    Integer quantidade, BigDecimal valorUnitarioCobrado) {
+        this.ordemServico = ordemServico;
+        this.peca = peca;
+        this.quantidade = quantidade;
+        this.precoUnitario = (valorUnitarioCobrado != null ?
+                valorUnitarioCobrado : peca.getPrecoVenda());
+    }
 
     public BigDecimal getSubtotal() {
         if (precoUnitario == null || quantidade == null) {
