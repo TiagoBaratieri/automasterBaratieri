@@ -26,4 +26,11 @@ public class Veiculo {
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
+    public Veiculo(String placa, String modelo, String marca, Integer ano, Cliente cliente) {
+        this.placa = placa;
+        this.modelo = modelo;
+        this.marca = marca;
+        this.ano = ano;
+        this.cliente = cliente;
+    }
 }

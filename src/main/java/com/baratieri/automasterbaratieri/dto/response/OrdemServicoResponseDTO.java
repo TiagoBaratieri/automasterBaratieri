@@ -31,6 +31,7 @@ public record OrdemServicoResponseDTO(
             String descricaoServico,
             String observacaoMecanico,
             Integer quantidade,
+            String nomeMecanico,
             BigDecimal valorCobrado,
             BigDecimal subtotal
     ) {
@@ -64,6 +65,7 @@ public record OrdemServicoResponseDTO(
                         item.getServico().getDescricao(),
                         item.getObservacao(),
                         item.getQuantidade(),
+                        item.getMecanicoResponsavel().getNome(),
                         item.getValorCobrado(),
                         item.getSubtotal()
                 )).toList();

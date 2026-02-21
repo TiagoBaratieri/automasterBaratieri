@@ -5,16 +5,16 @@ import com.baratieri.automasterbaratieri.dto.response.ServicoResponseDTO;
 import com.baratieri.automasterbaratieri.entities.Servico;
 import com.baratieri.automasterbaratieri.repositories.ServicoRepository;
 import com.baratieri.automasterbaratieri.services.exceptions.RegraNegocioException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class MaoDeObraService {
 
-    private ServicoRepository servicoRepository;
+    private final ServicoRepository servicoRepository;
     @Transactional
     public ServicoResponseDTO salvar(ServicoRequestDTO dto) {
 

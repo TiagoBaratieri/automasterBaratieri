@@ -31,4 +31,14 @@ public class Mecanico {
 
     @Column(nullable = false)
     private Boolean ativo = true;
+
+    public Mecanico(String nome, String cpf, String especialidade,
+                    BigDecimal taxaComissao, Boolean ativo) {
+        this.nome = nome;
+        this.cpf = cpf;
+        this.especialidade = especialidade;
+        this.taxaComissao = taxaComissao;
+        this.ativo = ativo;
+
+    }
 }

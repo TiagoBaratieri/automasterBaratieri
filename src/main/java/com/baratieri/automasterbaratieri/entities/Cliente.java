@@ -34,4 +34,12 @@ public class Cliente {
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Veiculo> veiculos = new ArrayList<>();
+
+    public Cliente(String nome, String cpfOuCnpj, Endereco endereco, String telefone, String email) {
+        this.nome = nome;
+        this.cpfOuCnpj = cpfOuCnpj;
+        this.endereco = endereco;
+        this.telefone = telefone;
+        this.email = email;
+    }
 }

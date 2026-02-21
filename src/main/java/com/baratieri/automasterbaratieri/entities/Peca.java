@@ -44,6 +44,20 @@ public class Peca {
 
     private Integer estoqueMinimo = 5;
 
+    public Peca(String sku, String nome, String partNumber, String marca,
+                String aplicacao, BigDecimal precoVenda, BigDecimal precoCusto,
+                Integer quantidadeEstoque, Integer estoqueMinimo) {
+        this.sku = sku;
+        this.nome = nome;
+        this.partNumber = partNumber;
+        this.marca = marca;
+        this.aplicacao = aplicacao;
+        this.precoVenda = precoVenda;
+        this.precoCusto = precoCusto;
+        this.quantidadeEstoque = quantidadeEstoque;
+        this.estoqueMinimo = estoqueMinimo;
+    }
+
     public void adicionarEstoque(Integer quantidade) {
         if (quantidade < 0) {
             throw new IllegalArgumentException("Quantidade deve ser positiva.");

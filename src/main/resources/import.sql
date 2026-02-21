@@ -3,8 +3,8 @@ INSERT INTO cliente (nome, cpf_ou_cnpj, telefone, email, logradouro, numero, bai
 INSERT INTO cliente (nome, cpf_ou_cnpj, telefone, email, logradouro, numero, bairro, cep, cidade, estado) VALUES ('Auto Peças Avenida', '12345678000199', '4433334444', 'contato@avenida.com', 'Av. Maringá', '1000', 'Jardim', '87111222', 'Sarandi', 'PR');
 
 -- Inserindo Mecânicos
-INSERT INTO mecanico (nome, cpf, especialidade, taxa_comissao, ativo) VALUES ('Carlos Motor', '55566677788', 'Mecânica Geral', 10.00, true);
-INSERT INTO mecanico (nome, cpf, especialidade, taxa_comissao, ativo) VALUES ('Beto Suspensão', '99988877766', 'Suspensão e Freios', 15.00, true);
+INSERT INTO mecanico (nome, cpf, especialidade, taxa_comissao, ativo) VALUES ('Carlos Motor', '364.916.960-65', 'Mecânica Geral', 10.00, true);
+INSERT INTO mecanico (nome, cpf, especialidade, taxa_comissao, ativo) VALUES ('Beto Suspensão', '363.465.300-03', 'Suspensão e Freios', 15.00, true);
 
 -- Inserindo Serviços Base
 INSERT INTO servico (descricao, valor_mao_de_obra_base) VALUES ('Troca de Óleo + Filtros', 60.00);
