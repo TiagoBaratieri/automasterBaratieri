@@ -8,7 +8,15 @@ import java.util.function.Predicate;
 
 // O Lombok cria o construtor privado automaticamente por debaixo dos panos!
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class DocumentoUtil {
+public class FormatacaoUtil {
+
+    public static String limparPlaca(String placa) {
+        if (placa == null) return null;
+
+        // O [^a-zA-Z0-9] significa: "Apague TUDO que NÃO for letra (a-z) ou número (0-9)"
+        // Depois, transforma tudo que sobrou em maiúsculo.
+        return placa.replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
+    }
 
     public static String limparDocumento(String documento){
         if (documento == null) return null;

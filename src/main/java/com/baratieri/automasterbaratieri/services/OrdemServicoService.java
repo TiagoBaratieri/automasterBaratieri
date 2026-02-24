@@ -8,11 +8,13 @@ import com.baratieri.automasterbaratieri.repositories.*;
 import com.baratieri.automasterbaratieri.services.exceptions.RegraNegocioException;
 import com.baratieri.automasterbaratieri.services.exceptions.ResourceNotFoundException;
 
+import com.baratieri.automasterbaratieri.services.util.FormatacaoUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 
 
 @Service
@@ -30,13 +32,21 @@ public class OrdemServicoService {
 
     @Transactional(readOnly = true)
     public OrdemServicoResponseDTO buscarOrdemServicoPorId(Long id) {
-       OrdemServico os = ordemServicoExiste(id);
+        OrdemServico os = ordemServicoExiste(id);
         return OrdemServicoResponseDTO.fromEntity(os);
     }
 
     @Transactional(readOnly = true)
-    public List<OrdemServicoResponseDTO> buscarTodosOrdemServico(String placa, StatusOS status) {
-       return filtrarOrdemServico(status, placa);
+    public Page<OrdemServicoResponseDTO> buscarOrdemServico(String placa,
+                                                            StatusOS status,
+                                                            Pageable pageable) {
+
+        String placaLimpa = FormatacaoUtil.limparPlaca(placa);
+
+        Page<OrdemServico> paginaOs =
+                ordemServicoRepository.buscarOrdemServicoComFiltros(placaLimpa, status, pageable);
+
+        return paginaOs.map(OrdemServicoResponseDTO::fromEntity);
     }
 
     @Transactional
@@ -46,7 +56,6 @@ public class OrdemServicoService {
 
         OrdemServico os = new OrdemServico(veiculo, dto.observacaoInicial());
         return OrdemServicoResponseDTO.fromEntity(ordemServicoRepository.save(os));
-
     }
 
     @Transactional
@@ -55,8 +64,8 @@ public class OrdemServicoService {
         Servico servico = validarServicoExistente(payloadDTO);
         Mecanico mecanico = validarMecanicoExistente(payloadDTO);
 
-        ItemServico itemServico = new ItemServico(os,servico,mecanico,payloadDTO.valorCobrado(),
-                payloadDTO.quantidade(),payloadDTO.observacao());
+        ItemServico itemServico = new ItemServico(os, servico, mecanico, payloadDTO.valorCobrado(),
+                payloadDTO.quantidade(), payloadDTO.observacao());
 
         os.adicionarItemMaoDeObra(itemServico);
         itemServicoRepository.save(itemServico);
@@ -71,7 +80,7 @@ public class OrdemServicoService {
         Peca peca = validarPecaExistente(payload);
         peca.baixarEstoque(payload.quantidade());
 
-        ItemPeca itemPeca = new ItemPeca(os,peca, payload.quantidade(), payload.valorUnitario());
+        ItemPeca itemPeca = new ItemPeca(os, peca, payload.quantidade(), payload.valorUnitario());
 
         os.adicionarItemOrdemServico(itemPeca);
         itemPecaRepository.save(itemPeca);
@@ -122,19 +131,8 @@ public class OrdemServicoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Ordem de Serviço não encontrada com ID: " + id));
     }
 
-    private List<OrdemServicoResponseDTO> filtrarOrdemServico(StatusOS status, String placa) {
-        List<OrdemServico> ordemServicos = ordemServicoRepository.buscarOSComFiltros(placa, status);
-
-        if (ordemServicos.isEmpty()) {
-            throw new ResourceNotFoundException("Nenhuma Ordem de Serviço encontrada para os filtros informados.");
-        }
-        return ordemServicos.stream()
-                .map(OrdemServicoResponseDTO::fromEntity)
-                .toList();
-    }
-
     private Veiculo validarVeiculoExistente(AberturaOsRequestDTO dto) {
-         return veiculoRepository.findByPlaca(dto.placaVeiculo())
+        return veiculoRepository.findByPlaca(dto.placaVeiculo())
                 .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado com a placa: " +
                         dto.placaVeiculo()));
     }
@@ -152,7 +150,7 @@ public class OrdemServicoService {
     }
 
     private Peca validarPecaExistente(PecaPayloadDTO dto) {
-        return  pecaRepository.findById(dto.pecaId())
+        return pecaRepository.findById(dto.pecaId())
                 .orElseThrow(() -> new ResourceNotFoundException("Peça não encontrada."));
 
     }

@@ -11,7 +11,7 @@ public record MecanicoResponseDTO(
         BigDecimal taxaComissao,
         Boolean ativo) {
 
-    public static MecanicoResponseDTO fromDTO(Mecanico mecanico) {
+    public static MecanicoResponseDTO fromEntity(Mecanico mecanico) {
         if (mecanico == null) return null;
         return new MecanicoResponseDTO(
                 mecanico.getNome(),

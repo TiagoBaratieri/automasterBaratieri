@@ -7,12 +7,16 @@ import com.baratieri.automasterbaratieri.enums.StatusOS;
 import com.baratieri.automasterbaratieri.services.OrdemServicoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
+
 
 @RestController
 @RequestMapping(value = "/ordens-servico")
@@ -28,12 +32,15 @@ public class OrdemServicoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrdemServicoResponseDTO>> buscarOrdemServicoPlacaOuStatus(
+    public ResponseEntity<Page<OrdemServicoResponseDTO>> buscarOrdemServico(
             @RequestParam(name = "placa", required = false) String placa,
-            @RequestParam(name = "status", required = false) StatusOS status) {
+            @RequestParam(name = "status", required = false) StatusOS status,
+            @PageableDefault(size = 10, page = 0, sort = "dataAbertura", direction =
+                    Sort.Direction.DESC) Pageable pageable) {
 
-        List<OrdemServicoResponseDTO> ordemServicos = ordemServicoService.buscarTodosOrdemServico(placa, status);
-        return ResponseEntity.ok(ordemServicos);
+        Page<OrdemServicoResponseDTO> ordemServicosDTO =
+                ordemServicoService.buscarOrdemServico(placa, status,pageable);
+        return ResponseEntity.ok(ordemServicosDTO);
     }
 
     @PostMapping

@@ -4,21 +4,41 @@ import com.baratieri.automasterbaratieri.dto.request.MecanicoRequestDTO;
 import com.baratieri.automasterbaratieri.dto.response.MecanicoResponseDTO;
 import com.baratieri.automasterbaratieri.entities.Mecanico;
 import com.baratieri.automasterbaratieri.repositories.MecanicoRepository;
-import com.baratieri.automasterbaratieri.services.util.DocumentoUtil;
+import com.baratieri.automasterbaratieri.services.exceptions.ResourceNotFoundException;
+import com.baratieri.automasterbaratieri.services.util.FormatacaoUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 @RequiredArgsConstructor
 public class MecanicoService {
     private final MecanicoRepository mecanicoRepository;
 
-    @Transactional
-    public MecanicoResponseDTO salvar(MecanicoRequestDTO dto) {
+    @Transactional(readOnly = true)
+    public MecanicoResponseDTO buscarMecanicoPorId(Long mecanicoId) {
+        Mecanico mecanico = validarMecanicoId(mecanicoId);
+        return MecanicoResponseDTO.fromEntity(mecanico);
+    }
 
-        String cpfLimpo = DocumentoUtil.limparDocumento(dto.cpf());
-        DocumentoUtil.validarDocumentoUnico(
+    public Page<MecanicoResponseDTO> buscarMecanico(String nome,
+                                                    String especialidade,
+                                                    Boolean ativo, Pageable pageable) {
+        Page<Mecanico> mecanicoPage =
+                mecanicoRepository.buscarMecanicoComFiltro(nome,especialidade,ativo,pageable);
+
+        return mecanicoPage.map(MecanicoResponseDTO::fromEntity);
+    }
+
+
+    @Transactional
+    public MecanicoResponseDTO salvarMecanico(MecanicoRequestDTO dto) {
+
+        String cpfLimpo = FormatacaoUtil.limparDocumento(dto.cpf());
+        FormatacaoUtil.validarDocumentoUnico(
                 cpfLimpo,
                 dto.cpf(),
                 "Mecânico",
@@ -26,7 +46,13 @@ public class MecanicoService {
         );
         Mecanico mecanico = new Mecanico(dto.nome(), cpfLimpo, dto.especialidade(),
                 dto.taxaComissao(), dto.ativo());
-        return MecanicoResponseDTO.fromDTO(mecanicoRepository.save(mecanico));
+        return MecanicoResponseDTO.fromEntity(mecanicoRepository.save(mecanico));
+    }
+
+    private Mecanico validarMecanicoId(Long mecanicoId) {
+        return mecanicoRepository.findById(mecanicoId).orElseThrow(() ->
+                new ResourceNotFoundException("Mecânico não encontrada com ID: " + mecanicoId));
+
     }
 
 }

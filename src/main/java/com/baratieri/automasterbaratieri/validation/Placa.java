@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 
 @NotBlank(message = "A placa é obrigatória")
 
-@Pattern(regexp = "[A-Z]{3}-?[0-9][0-9A-Z][0-9]{2}", message = "A placa deve seguir o padrão (ex: ABC-1234 ou ABC1D23)")
+@Pattern(regexp = "[a-zA-Z]{3}-?[0-9][0-9a-zA-Z][0-9]{2}", message = "A placa deve seguir o padrão (ex: ABC-1234 ou ABC1D23)")
 @ReportAsSingleViolation
 @Constraint(validatedBy = {})
 @Target({ElementType.FIELD, ElementType.PARAMETER})
