@@ -10,6 +10,13 @@ import java.util.function.Predicate;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FormatacaoUtil {
 
+    public static String formatarTextoOpcional(String valor) {
+        if (valor == null || valor.trim().isEmpty()) {
+            return null; // Se for nulo ou só tiver espaço em branco, salva como nulo no banco.
+        }
+        return valor.trim().toUpperCase(); // Se tiver texto, limpa os cantos e deixa maiúsculo!
+    }
+
     public static String limparPlaca(String placa) {
         if (placa == null) return null;
 
@@ -29,5 +36,12 @@ public class FormatacaoUtil {
             throw new RegraNegocioException("Já existe um(a) " + nomeEntidade +
                     " cadastrado(a) com este documento: " + docOriginal);
         }
+    }
+
+    public static String formatarEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            return null;
+        }
+        return email.trim().toLowerCase();
     }
 }

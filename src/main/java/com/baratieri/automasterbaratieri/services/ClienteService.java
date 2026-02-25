@@ -56,6 +56,14 @@ public class ClienteService {
         return ClienteResponseDTO.fromEntity(clienteRepository.save(cliente));
     }
 
+    @Transactional
+    public ClienteResponseDTO atualizarCliente(Long id, ClienteRequestDTO dto) {
+        Cliente cliente = validarClienteId(id);
+        cliente.atualizarDadosDeContato(dto.endereco(), dto.telefone(), dto.email());
+
+        return ClienteResponseDTO.fromEntity(cliente);
+    }
+
     private Cliente validarClienteId(Long clienteId) {
         return clienteRepository.findById(clienteId).
                 orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrada com ID: " + clienteId));

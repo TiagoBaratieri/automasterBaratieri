@@ -8,6 +8,10 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.baratieri.automasterbaratieri.services.util.FormatacaoUtil.formatarEmail;
+import static com.baratieri.automasterbaratieri.services.util.FormatacaoUtil.formatarTextoOpcional;
+import static com.baratieri.automasterbaratieri.services.util.ValidadorUtil.validarDadosObrigatorio;
+
 
 @Entity
 @Data
@@ -36,10 +40,22 @@ public class Cliente {
     private List<Veiculo> veiculos = new ArrayList<>();
 
     public Cliente(String nome, String cpfOuCnpj, Endereco endereco, String telefone, String email) {
-        this.nome = nome;
+
+        validarDadosObrigatorio(nome, "O nome do cliente é obrigatório.");
+        validarDadosObrigatorio(cpfOuCnpj, "O CPF ou CNPJ é obrigatório.");
+
+        this.nome = nome.trim().toUpperCase();
         this.cpfOuCnpj = cpfOuCnpj;
+
+        this.atualizarDadosDeContato(endereco, telefone, email);
+    }
+    public void atualizarDadosDeContato(Endereco endereco, String telefone, String email) {
+
         this.endereco = endereco;
-        this.telefone = telefone;
-        this.email = email;
+        this.telefone = formatarTextoOpcional(telefone);
+
+        this.email = formatarEmail(email);
     }
 }
+
+

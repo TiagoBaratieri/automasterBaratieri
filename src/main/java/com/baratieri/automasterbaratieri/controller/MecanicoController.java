@@ -40,14 +40,21 @@ public class MecanicoController {
         return ResponseEntity.ok().body(responseDTOS);
     }
 
-
-
     @PostMapping
-    public ResponseEntity<MecanicoResponseDTO> salvar(@RequestBody @Valid MecanicoRequestDTO dto) {
+    public ResponseEntity<MecanicoResponseDTO> salvarMecanico(@RequestBody @Valid MecanicoRequestDTO dto) {
         MecanicoResponseDTO mecanicoDto = mecanicoService.salvarMecanico(dto);
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").build().toUri();
         return ResponseEntity.created(uri).body(mecanicoDto);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<MecanicoResponseDTO> atualizarMecanico(
+            @PathVariable Long id,
+            @RequestBody @Valid MecanicoRequestDTO dto) {
+
+        MecanicoResponseDTO responseDTO = mecanicoService.atualizarMecanico(id, dto);
+        return ResponseEntity.ok().body(responseDTO);
     }
 }

@@ -45,10 +45,18 @@ public class PecaController {
     @PostMapping
     public ResponseEntity<PecaResponseDTO> salvarPeca(
             @RequestBody @Valid PecaRequestDTO pecaRequestDTO) {
-        PecaResponseDTO pecaDto = pecaService.salvarPecas(pecaRequestDTO);
+        PecaResponseDTO pecaDto = pecaService.salvarPeca(pecaRequestDTO);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").build().toUri();
         return ResponseEntity.created(uri).body(pecaDto);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PecaResponseDTO> atualizarPeca(
+            @PathVariable Long id, @Valid @RequestBody PecaRequestDTO pecaRequestDTO) {
+        PecaResponseDTO responseDTO = pecaService.atualizarPeca(id, pecaRequestDTO);
+        return ResponseEntity.ok(responseDTO);
+    }
+
 }
 

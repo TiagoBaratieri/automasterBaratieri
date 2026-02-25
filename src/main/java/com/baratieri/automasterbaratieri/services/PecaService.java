@@ -6,6 +6,7 @@ import com.baratieri.automasterbaratieri.entities.Peca;
 import com.baratieri.automasterbaratieri.repositories.PecaRepository;
 import com.baratieri.automasterbaratieri.services.exceptions.RegraNegocioException;
 import com.baratieri.automasterbaratieri.services.exceptions.ResourceNotFoundException;
+import com.baratieri.automasterbaratieri.services.util.FormatacaoUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,8 +22,8 @@ public class PecaService {
 
 
     @Transactional(readOnly = true)
-    public PecaResponseDTO buscarPecaPorId(Long pecaId) {
-        Peca peca = validarPecaId(pecaId);
+    public PecaResponseDTO buscarPecaPorId(Long id) {
+        Peca peca = validarPecaId(id);
         return PecaResponseDTO.fromEntity(peca);
     }
 
@@ -35,28 +36,40 @@ public class PecaService {
     }
 
     @Transactional
-    public PecaResponseDTO salvarPecas(PecaRequestDTO dto) {
+    public PecaResponseDTO salvarPeca(PecaRequestDTO dto) {
 
-        String skuLimpo = dto.sku().trim().toUpperCase();
-        String partNumberLimpo = dto.partNumber() != null ? dto.partNumber().trim() : null;
+        String skuLimpo = FormatacaoUtil.formatarTextoOpcional(dto.sku());
+        String partNumberLimpo = FormatacaoUtil.formatarTextoOpcional(dto.partNumber());
 
         validarSkuPeca(skuLimpo);
         validarPartNumberPeca(partNumberLimpo);
 
         Peca peca = new Peca(
                 skuLimpo,
-                dto.nome().trim(),
+                dto.nome(),
                 partNumberLimpo,
-                dto.marca().trim(),
-                dto.aplicacao().trim(),
-                dto.precoCusto(),
+                dto.marca(),
+                dto.aplicacao(),
                 dto.precoVenda(),
+                dto.precoCusto(),
                 dto.quantidadeEstoque(),
                 dto.estoqueMinimo()
         );
-
         peca = pecaRepository.save(peca);
+        return PecaResponseDTO.fromEntity(peca);
+    }
 
+    @Transactional
+    public PecaResponseDTO atualizarPeca(Long id, PecaRequestDTO dto) {
+        Peca peca = validarPecaId(id);
+        peca.atualizarPeca(dto.precoVenda(),dto.precoCusto(),dto.estoqueMinimo());
+        return PecaResponseDTO.fromEntity(peca);
+    }
+
+    @Transactional
+    public PecaResponseDTO adicionarEstoque(Long id, Integer quantidade) {
+        Peca peca = validarPecaId(id);
+        peca.adicionarEstoque(quantidade);
         return PecaResponseDTO.fromEntity(peca);
     }
 
