@@ -4,12 +4,14 @@ import com.baratieri.automasterbaratieri.dto.request.*;
 import com.baratieri.automasterbaratieri.dto.response.OrdemServicoResponseDTO;
 import com.baratieri.automasterbaratieri.entities.*;
 import com.baratieri.automasterbaratieri.enums.StatusOS;
+import com.baratieri.automasterbaratieri.eventos.EstoqueBaixoEvento;
 import com.baratieri.automasterbaratieri.repositories.*;
 import com.baratieri.automasterbaratieri.services.exceptions.RegraNegocioException;
 import com.baratieri.automasterbaratieri.services.exceptions.ResourceNotFoundException;
 
 import com.baratieri.automasterbaratieri.services.util.FormatacaoUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ public class OrdemServicoService {
     private final ServicoRepository servicoRepository;
     private final ItemPecaRepository itemPecaRepository;
     private final PecaRepository pecaRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     @Transactional(readOnly = true)
@@ -58,7 +61,7 @@ public class OrdemServicoService {
     }
 
     @Transactional
-    public OrdemServicoResponseDTO adicionarMaoDeObraOrdemServico(Long osId, ServicoPayloadDTO payloadDTO) {
+    public OrdemServicoResponseDTO adicionarServicoOrdemServico(Long osId, ServicoPayloadDTO payloadDTO) {
         OrdemServico os = ordemServicoExiste(osId);
         Servico servico = validarServicoExistente(payloadDTO);
         Mecanico mecanico = validarMecanicoExistente(payloadDTO);
@@ -66,7 +69,7 @@ public class OrdemServicoService {
         ItemServico itemServico = new ItemServico(os, servico, mecanico, payloadDTO.valorCobrado(),
                 payloadDTO.quantidade(), payloadDTO.observacao());
 
-        os.adicionarItemMaoDeObra(itemServico);
+        os.adicionarServico(itemServico);
         itemServicoRepository.save(itemServico);
 
         return OrdemServicoResponseDTO.fromEntity(os);
@@ -78,10 +81,10 @@ public class OrdemServicoService {
         OrdemServico os = ordemServicoExiste(osId);
         Peca peca = validarPecaExistente(payload);
         peca.baixarEstoque(payload.quantidade());
-
+        verificarEDispararEventoEstoque(peca);
         ItemPeca itemPeca = new ItemPeca(os, peca, payload.quantidade(), payload.valorUnitario());
 
-        os.adicionarItemOrdemServico(itemPeca);
+        os.adicionarPecaOrdemServico(itemPeca);
         itemPecaRepository.save(itemPeca);
 
         return OrdemServicoResponseDTO.fromEntity(os);
@@ -89,10 +92,39 @@ public class OrdemServicoService {
     }
 
     @Transactional
+    public OrdemServicoResponseDTO atualizarDescricaoServico(Long osId,
+                                                             AtualizarObservacaoOsRequestDTO dto) {
+        OrdemServico os = ordemServicoExiste(osId);
+        os.atualizarDescricaoServico(dto.observacao());
+        return OrdemServicoResponseDTO.fromEntity(ordemServicoRepository.save(os));
+    }
+
+    @Transactional
+    public OrdemServicoResponseDTO removerPecaOrdemServico(Long osId, Long itemPecaId) {
+        OrdemServico os = ordemServicoExiste(osId);
+
+        ItemPeca itemPeca = validarItemPecaExistente(itemPecaId);
+        os.removerPecaOrdemServico(itemPeca);
+
+        itemPecaRepository.delete(itemPeca);
+        return OrdemServicoResponseDTO.fromEntity(ordemServicoRepository.save(os));
+    }
+
+    @Transactional
+    public OrdemServicoResponseDTO removerServicoOrdemServico(Long osId, Long itemServicoId) {
+        OrdemServico os = ordemServicoExiste(osId);
+
+        ItemServico itemServico = validarItemServicoExistente(itemServicoId);
+        os.removerItemServico(itemServico);
+        itemServicoRepository.delete(itemServico);
+        return OrdemServicoResponseDTO.fromEntity(ordemServicoRepository.save(os));
+    }
+
+    @Transactional
     public OrdemServicoResponseDTO cancelarOrdemServico(Long id) {
         OrdemServico os = ordemServicoExiste(id);
         os.cancelarOs();
-        os.restornarPecasAoEstoque();
+        os.estornarPecasAoEstoque();
         ordemServicoRepository.save(os);
 
         return OrdemServicoResponseDTO.fromEntity(os);
@@ -152,5 +184,23 @@ public class OrdemServicoService {
         return pecaRepository.findById(dto.pecaId())
                 .orElseThrow(() -> new ResourceNotFoundException("Peça não encontrada."));
 
+    }
+
+    private ItemPeca validarItemPecaExistente(Long id) {
+        return itemPecaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Item de peça não encontrado."));
+
+    }
+
+    private ItemServico validarItemServicoExistente(Long id) {
+        return itemServicoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Item de serviço não encontrado."));
+
+    }
+
+    private void verificarEDispararEventoEstoque(Peca peca) {
+        if (peca.precisaReporEstoque()){
+            eventPublisher.publishEvent(EstoqueBaixoEvento.fromEntity(peca));
+        }
     }
 }

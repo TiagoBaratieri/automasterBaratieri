@@ -92,9 +92,10 @@ public class Peca {
     }
 
     private void verificarQuantidadeEstoque(Integer quantidade) {
+        validarEstoqueNaoNegativo(quantidade,"Quantidade deve ser positiva.");
         if (quantidadeEstoque < quantidade) {
             throw new RegraNegocioException("Estoque insuficiente! Você tentou baixar " + quantidade
-                    + " mas só existem " + this.quantidadeEstoque + " peças disponíveis.");
+                    + " mas só existem " + quantidadeEstoque + " peças disponíveis.");
         }
     }
 
