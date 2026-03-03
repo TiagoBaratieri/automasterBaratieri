@@ -1,5 +1,6 @@
 package com.baratieri.automasterbaratieri.services;
 
+import com.baratieri.automasterbaratieri.dto.request.ClienteAtualizacaoRequestDTO;
 import com.baratieri.automasterbaratieri.dto.request.ClienteRequestDTO;
 import com.baratieri.automasterbaratieri.dto.response.ClienteResponseDTO;
 import com.baratieri.automasterbaratieri.entities.Cliente;
@@ -57,7 +58,7 @@ public class ClienteService {
     }
 
     @Transactional
-    public ClienteResponseDTO atualizarCliente(Long id, ClienteRequestDTO dto) {
+    public ClienteResponseDTO atualizarCliente(Long id, ClienteAtualizacaoRequestDTO dto) {
         Cliente cliente = validarClienteId(id);
         cliente.atualizarDadosDeContato(dto.endereco(), dto.telefone(), dto.email());
 

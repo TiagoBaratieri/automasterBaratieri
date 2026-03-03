@@ -1,5 +1,6 @@
 package com.baratieri.automasterbaratieri.services;
 
+import com.baratieri.automasterbaratieri.dto.request.AtualizarMecanicoRequestDTO;
 import com.baratieri.automasterbaratieri.dto.request.MecanicoRequestDTO;
 import com.baratieri.automasterbaratieri.dto.response.MecanicoResponseDTO;
 import com.baratieri.automasterbaratieri.entities.Mecanico;
@@ -51,7 +52,7 @@ public class MecanicoService {
     }
 
     @Transactional
-    public MecanicoResponseDTO atualizarMecanico(Long id, MecanicoRequestDTO dto) {
+    public MecanicoResponseDTO atualizarMecanico(Long id, AtualizarMecanicoRequestDTO dto) {
         Mecanico mecanico = validarMecanicoId(id);
         mecanico.atualizarDados(dto.taxaComissao(), dto.ativo());
         return MecanicoResponseDTO.fromEntity(mecanicoRepository.save(mecanico));

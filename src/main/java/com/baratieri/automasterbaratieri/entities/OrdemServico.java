@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.baratieri.automasterbaratieri.services.util.ValidadorUtil.*;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -51,17 +53,47 @@ public class OrdemServico {
         this.descricao = descricao;
         this.dataAbertura = LocalDateTime.now();
         this.status = StatusOS.ORCAMENTO;
+
     }
-    public void adicionarItemOrdemServico(ItemPeca item) {
+
+    public void adicionarPecaOrdemServico(ItemPeca item) {
         validarStatusOrdemServicoFinalizadaOuCancelada();
         itensPeca.add(item);
         calcularTotal();
     }
 
-    public void adicionarItemMaoDeObra(ItemServico item) {
+    public void adicionarServico(ItemServico item) {
         validarStatusOrdemServicoFinalizadaOuCancelada();
         itensServico.add(item);
         calcularTotal();
+    }
+
+    public void removerPecaOrdemServico(ItemPeca item) {
+        if (item == null) {
+            throw new RegraNegocioException("O item de peça não pode ser nulo.");
+        }
+        validarStatusOrdemServicoFinalizadaOuCancelada();
+        if (!itensPeca.contains(item)) {
+            throw new RegraNegocioException("Este item de peça não pertence a esta Ordem de Serviço.");
+        }
+        item.getPeca().adicionarEstoque(item.getQuantidade());
+        itensPeca.remove(item);
+
+        calcularTotal();
+    }
+
+    public void removerItemServico(ItemServico item) {
+        if (item == null) {
+            throw new RegraNegocioException("O item de serviço não pode ser nulo.");
+        }
+        validarStatusOrdemServicoFinalizadaOuCancelada();
+
+        if (!itensServico.contains(item)) {
+            throw new RegraNegocioException("Este item de serviço não pertence a esta Ordem de Serviço.");
+        }
+
+        this.itensServico.remove(item);
+        this.calcularTotal();
     }
 
     public void calcularTotal() {
@@ -74,7 +106,7 @@ public class OrdemServico {
                     .reduce(BigDecimal.ZERO, BigDecimal::add); // Soma acumulada
         }
 
-        // 2. Soma o total dos SERVIÇOS
+        //Soma o total dos SERVIÇOS
         BigDecimal totalServicos = BigDecimal.ZERO;
 
         if (itensServico != null && !itensServico.isEmpty()) {
@@ -87,39 +119,41 @@ public class OrdemServico {
         this.valorTotal = totalPecas.add(totalServicos);
     }
 
+    public void atualizarDescricaoServico(String descricao) {
+        validarDadosObrigatorio(descricao, "A descrição do serviço é obrigatória.");
+        this.descricao = descricao;
+    }
+
     public void cancelarOs() {
-        if (status == StatusOS.FINALIZADO) {
-            throw new RegraNegocioException("Não é possível cancelar uma Ordem de Serviço que já está concluída.");
-        }
-        if (status == StatusOS.CANCELADO) {
-            throw new RegraNegocioException("Esta Ordem de Serviço já encontra-se cancelada.");
-        }
+        validarStatusOrdemServicoFinalizadaOuCancelada();
         status = StatusOS.CANCELADO;
         dataFechamento = LocalDateTime.now();
     }
 
-    public void restornarPecasAoEstoque(){
+    public void estornarPecasAoEstoque() {
         if (itensPeca != null) {
             itensPeca.forEach(item -> item.getPeca().adicionarEstoque(item.getQuantidade()));
         }
     }
 
-    public void aprovarOrcamento(){
-        if (status != StatusOS.ORCAMENTO) {
-            throw new RegraNegocioException("Essa OS não pode ser iniciada pois está: "
-                    + status);
-        }
+    public void aprovarOrcamento() {
+        validarStatusOrdemServicoOrcamento(status, "Essa OS não pode ser iniciada pois está: "
+                + status);
         status = StatusOS.EM_EXECUCAO;
     }
 
     public void finalizarOs() {
-        if (status != StatusOS.EM_EXECUCAO) {
-            throw new RegraNegocioException("Não é possível finalizar uma O.S. com status " + status +
-                    ". A O.S. precisa estar EM_EXECUCAO.");
-        }
+        validarStatusOrdemServicoEmExecucao(status, "Não é possível finalizar uma O.S. com status " + status +
+                ". A O.S. precisa estar EM_EXECUCAO.");
 
         status = StatusOS.FINALIZADO;
         dataFechamento = LocalDateTime.now();
+    }
+
+    private void validarStatusOrdemServicoFinalizadaOuCancelada() {
+        if (status == StatusOS.FINALIZADO || status == StatusOS.CANCELADO) {
+            throw new RegraNegocioException("Não é possível adicionar peças em uma OS encerrada ou cancelada.");
+        }
     }
 
     @PrePersist
@@ -128,9 +162,4 @@ public class OrdemServico {
         this.calcularTotal();
     }
 
-    private void validarStatusOrdemServicoFinalizadaOuCancelada() {
-        if (this.status == StatusOS.FINALIZADO || this.status == StatusOS.CANCELADO) {
-            throw new RegraNegocioException("Não é possível adicionar peças em uma OS encerrada.");
-        }
-    }
 }

@@ -1,5 +1,6 @@
 package com.baratieri.automasterbaratieri.controller;
 
+import com.baratieri.automasterbaratieri.dto.request.AtualizarMecanicoRequestDTO;
 import com.baratieri.automasterbaratieri.dto.request.MecanicoRequestDTO;
 import com.baratieri.automasterbaratieri.dto.response.MecanicoResponseDTO;
 import com.baratieri.automasterbaratieri.services.MecanicoService;
@@ -49,10 +50,10 @@ public class MecanicoController {
         return ResponseEntity.created(uri).body(mecanicoDto);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<MecanicoResponseDTO> atualizarMecanico(
             @PathVariable Long id,
-            @RequestBody @Valid MecanicoRequestDTO dto) {
+            @RequestBody @Valid AtualizarMecanicoRequestDTO dto) {
 
         MecanicoResponseDTO responseDTO = mecanicoService.atualizarMecanico(id, dto);
         return ResponseEntity.ok().body(responseDTO);

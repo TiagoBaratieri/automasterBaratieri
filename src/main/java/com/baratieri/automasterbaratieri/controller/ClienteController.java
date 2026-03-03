@@ -1,5 +1,6 @@
 package com.baratieri.automasterbaratieri.controller;
 
+import com.baratieri.automasterbaratieri.dto.request.ClienteAtualizacaoRequestDTO;
 import com.baratieri.automasterbaratieri.dto.request.ClienteRequestDTO;
 import com.baratieri.automasterbaratieri.dto.response.ClienteResponseDTO;
 import com.baratieri.automasterbaratieri.services.ClienteService;
@@ -48,8 +49,9 @@ public class ClienteController {
         return ResponseEntity.created(uri).body(clienteDto);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ClienteResponseDTO> atualizarCliente(@PathVariable Long id, @Valid @RequestBody ClienteRequestDTO dto) {
+    @PatchMapping("/{id}")
+    public ResponseEntity<ClienteResponseDTO> atualizarCliente(@PathVariable Long id,
+                                                               @Valid @RequestBody ClienteAtualizacaoRequestDTO dto) {
         ClienteResponseDTO clienteDto = clienteService.atualizarCliente(id, dto);
         return ResponseEntity.ok().body(clienteDto);
     }

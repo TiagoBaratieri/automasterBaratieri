@@ -51,7 +51,7 @@ public class Mecanico {
 
     public void atualizarDados(BigDecimal taxaComissao, Boolean ativo){
         validarValorPositivo(taxaComissao, "A taxa de comissão não pode ser nula. Ou negativa.");
-        validarStatus(ativo,"O status do mecânico (ativo/inativo) deve ser informado.");
+        validarStatusMecanico(ativo,"O status do mecânico (ativo/inativo) deve ser informado.");
         this.taxaComissao = taxaComissao;
         this.ativo = ativo;
     }

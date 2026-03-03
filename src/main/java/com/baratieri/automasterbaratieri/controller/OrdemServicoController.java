@@ -39,7 +39,7 @@ public class OrdemServicoController {
                     Sort.Direction.DESC) Pageable pageable) {
 
         Page<OrdemServicoResponseDTO> ordemServicosDTO =
-                ordemServicoService.buscarOrdemServico(placa, status,pageable);
+                ordemServicoService.buscarOrdemServico(placa, status, pageable);
         return ResponseEntity.ok(ordemServicosDTO);
     }
 
@@ -66,13 +66,36 @@ public class OrdemServicoController {
     }
 
     @PostMapping("/{id}/servicos")
-    public ResponseEntity<OrdemServicoResponseDTO> adicionarMaoDeObraOrdemServico(
+    public ResponseEntity<OrdemServicoResponseDTO> adicionarOrdemServico(
             @PathVariable Long id,
             @RequestBody @Valid ServicoPayloadDTO payload) {
-        OrdemServicoResponseDTO responseDTO = ordemServicoService.adicionarMaoDeObraOrdemServico(id, payload);
+        OrdemServicoResponseDTO responseDTO = ordemServicoService.adicionarServicoOrdemServico(id, payload);
 
         return ResponseEntity.ok(responseDTO);
     }
+
+    @PatchMapping("/{id}/observacao")
+    public ResponseEntity<OrdemServicoResponseDTO> atualizarDescricaoServico(
+            @PathVariable Long id, @RequestBody
+            @Valid AtualizarObservacaoOsRequestDTO dto) {
+        OrdemServicoResponseDTO responseDTO = ordemServicoService.atualizarDescricaoServico(id, dto);
+        return ResponseEntity.ok(responseDTO);
+    }
+
+    @DeleteMapping("/{id}/servicos/{idService}")
+    public ResponseEntity<OrdemServicoResponseDTO> removerOrdemServico(
+            @PathVariable Long id,
+            @PathVariable Long idService) {
+        return ResponseEntity.ok(ordemServicoService.removerServicoOrdemServico(id, idService));
+    }
+
+    @DeleteMapping("/{id}/pecas/{itemPecaId}")
+    public ResponseEntity<OrdemServicoResponseDTO> removerPeca(
+            @PathVariable Long id,
+            @PathVariable Long itemPecaId) {
+        return ResponseEntity.ok(ordemServicoService.removerPecaOrdemServico(id, itemPecaId));
+    }
+
 
     @PatchMapping("/{id}/aprovar")
     public ResponseEntity<OrdemServicoResponseDTO> aprovarOrdemServico(@PathVariable Long id) {

@@ -1,5 +1,6 @@
 package com.baratieri.automasterbaratieri.controller;
 
+import com.baratieri.automasterbaratieri.dto.request.AtualizarPecaRequestDTO;
 import com.baratieri.automasterbaratieri.dto.request.PecaRequestDTO;
 import com.baratieri.automasterbaratieri.dto.response.PecaResponseDTO;
 import com.baratieri.automasterbaratieri.services.PecaService;
@@ -51,10 +52,10 @@ public class PecaController {
         return ResponseEntity.created(uri).body(pecaDto);
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<PecaResponseDTO> atualizarPeca(
-            @PathVariable Long id, @Valid @RequestBody PecaRequestDTO pecaRequestDTO) {
-        PecaResponseDTO responseDTO = pecaService.atualizarPeca(id, pecaRequestDTO);
+            @PathVariable Long id, @Valid @RequestBody AtualizarPecaRequestDTO dto) {
+        PecaResponseDTO responseDTO = pecaService.atualizarPeca(id, dto);
         return ResponseEntity.ok(responseDTO);
     }
 

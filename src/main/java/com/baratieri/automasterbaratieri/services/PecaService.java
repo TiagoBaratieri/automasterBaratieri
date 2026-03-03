@@ -1,5 +1,6 @@
 package com.baratieri.automasterbaratieri.services;
 
+import com.baratieri.automasterbaratieri.dto.request.AtualizarPecaRequestDTO;
 import com.baratieri.automasterbaratieri.dto.request.PecaRequestDTO;
 import com.baratieri.automasterbaratieri.dto.response.PecaResponseDTO;
 import com.baratieri.automasterbaratieri.entities.Peca;
@@ -60,18 +61,12 @@ public class PecaService {
     }
 
     @Transactional
-    public PecaResponseDTO atualizarPeca(Long id, PecaRequestDTO dto) {
+    public PecaResponseDTO atualizarPeca(Long id, AtualizarPecaRequestDTO dto) {
         Peca peca = validarPecaId(id);
         peca.atualizarPeca(dto.precoVenda(),dto.precoCusto(),dto.estoqueMinimo());
         return PecaResponseDTO.fromEntity(peca);
     }
 
-    @Transactional
-    public PecaResponseDTO adicionarEstoque(Long id, Integer quantidade) {
-        Peca peca = validarPecaId(id);
-        peca.adicionarEstoque(quantidade);
-        return PecaResponseDTO.fromEntity(peca);
-    }
 
     private void validarSkuPeca(String skuLimpo) {
         if (pecaRepository.existsBySku(skuLimpo)) {
