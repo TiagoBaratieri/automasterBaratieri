@@ -59,5 +59,11 @@ public class PecaController {
         return ResponseEntity.ok(responseDTO);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluirPeca(@PathVariable Long id) {
+        pecaService.ExcluirPeca(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
 

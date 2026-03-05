@@ -13,7 +13,7 @@ import static com.baratieri.automasterbaratieri.services.util.ValidadorUtil.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Servico {
+public class Servico extends Inativavel {
 
     @Id //
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,5 +32,6 @@ public class Servico {
         this.descricao = formatarTextoOpcional(descricao);
         this.valorMaoDeObraBase = valor;
     }
+
 
 }

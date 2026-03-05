@@ -15,7 +15,7 @@ import static com.baratieri.automasterbaratieri.services.util.ValidadorUtil.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Mecanico {
+public class Mecanico extends Inativavel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,11 +33,9 @@ public class Mecanico {
     @Column(precision = 5, scale = 2)
     private BigDecimal taxaComissao;
 
-    @Column(nullable = false)
-    private Boolean ativo = true;
 
     public Mecanico(String nome, String cpf, String especialidade,
-                    BigDecimal taxaComissao, Boolean ativo) {
+                    BigDecimal taxaComissao) {
 
         validarDadosObrigatorio(nome, "O nome do mecânico é obrigatório.");
         validarDadosObrigatorio(cpf, "O CPF do mecânico é obrigatório.");
@@ -45,15 +43,13 @@ public class Mecanico {
         this.nome = formatarTextoOpcional(nome);
         this.cpf = formatarTextoOpcional(cpf);
         this.especialidade = formatarTextoOpcional(especialidade);
-        atualizarDados(taxaComissao, ativo);
+        atualizarDados(taxaComissao);
 
     }
 
-    public void atualizarDados(BigDecimal taxaComissao, Boolean ativo){
+    public void atualizarDados(BigDecimal taxaComissao){
         validarValorPositivo(taxaComissao, "A taxa de comissão não pode ser nula. Ou negativa.");
-        validarStatusMecanico(ativo,"O status do mecânico (ativo/inativo) deve ser informado.");
         this.taxaComissao = taxaComissao;
-        this.ativo = ativo;
     }
 
 

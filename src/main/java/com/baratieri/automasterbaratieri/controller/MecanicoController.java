@@ -58,4 +58,10 @@ public class MecanicoController {
         MecanicoResponseDTO responseDTO = mecanicoService.atualizarMecanico(id, dto);
         return ResponseEntity.ok().body(responseDTO);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluirMecanico(@PathVariable Long id){
+        mecanicoService.excluirMecanico(id);
+        return ResponseEntity.ok().build();
+    }
 }

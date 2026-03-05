@@ -55,4 +55,10 @@ public class ClienteController {
         ClienteResponseDTO clienteDto = clienteService.atualizarCliente(id, dto);
         return ResponseEntity.ok().body(clienteDto);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluirCliente(@PathVariable Long id) {
+        clienteService.excluirCliente(id);
+        return ResponseEntity.noContent().build();
+    }
 }

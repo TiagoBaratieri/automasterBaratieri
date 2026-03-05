@@ -67,6 +67,13 @@ public class PecaService {
         return PecaResponseDTO.fromEntity(peca);
     }
 
+    @Transactional
+    public void ExcluirPeca(Long id) {
+        Peca peca = validarPecaId(id);
+        peca.inativar();
+        pecaRepository.save(peca);
+    }
+
 
     private void validarSkuPeca(String skuLimpo) {
         if (pecaRepository.existsBySku(skuLimpo)) {

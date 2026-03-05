@@ -15,7 +15,7 @@ import static com.baratieri.automasterbaratieri.services.util.ValidadorUtil.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Peca {
+public class Peca extends Inativavel{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

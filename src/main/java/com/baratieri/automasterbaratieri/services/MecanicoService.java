@@ -47,14 +47,21 @@ public class MecanicoService {
                 mecanicoRepository::existsByCpf
         );
         Mecanico mecanico = new Mecanico(dto.nome(), cpfLimpo, dto.especialidade(),
-                dto.taxaComissao(), dto.ativo());
+                dto.taxaComissao());
         return MecanicoResponseDTO.fromEntity(mecanicoRepository.save(mecanico));
+    }
+
+    @Transactional
+    public void excluirMecanico(Long id) {
+        Mecanico mecanico = validarMecanicoId(id);
+        mecanico.inativar();
+        mecanicoRepository.save(mecanico);
     }
 
     @Transactional
     public MecanicoResponseDTO atualizarMecanico(Long id, AtualizarMecanicoRequestDTO dto) {
         Mecanico mecanico = validarMecanicoId(id);
-        mecanico.atualizarDados(dto.taxaComissao(), dto.ativo());
+        mecanico.atualizarDados(dto.taxaComissao());
         return MecanicoResponseDTO.fromEntity(mecanicoRepository.save(mecanico));
     }
 

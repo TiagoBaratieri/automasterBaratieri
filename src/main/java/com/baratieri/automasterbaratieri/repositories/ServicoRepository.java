@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 public interface ServicoRepository extends JpaRepository<Servico, Long> {
 
     @Query("SELECT s FROM Servico s WHERE " +
+            "s.ativo = true AND " +
             "(:descricao IS NULL OR LOWER(s.descricao) LIKE LOWER(CONCAT('%', :descricao, '%')))")
     Page<Servico> buscarServicosComFiltros(
             @Param("descricao") String descricao,

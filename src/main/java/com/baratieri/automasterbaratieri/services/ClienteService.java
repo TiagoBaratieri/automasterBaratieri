@@ -65,6 +65,13 @@ public class ClienteService {
         return ClienteResponseDTO.fromEntity(cliente);
     }
 
+    @Transactional
+    public void excluirCliente(Long id) {
+        Cliente cliente = validarClienteId(id);
+        cliente.inativar();
+        clienteRepository.save(cliente);
+    }
+
     private Cliente validarClienteId(Long clienteId) {
         return clienteRepository.findById(clienteId).
                 orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrada com ID: " + clienteId));

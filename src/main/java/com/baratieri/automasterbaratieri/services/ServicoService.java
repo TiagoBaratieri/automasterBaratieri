@@ -48,6 +48,14 @@ public class ServicoService {
         return ServicoResponseDTO.fromEntity(servico);
     }
 
+    @Transactional
+    public void excluirServico(Long id) {
+        Servico servico = validarServicoPorId(id);
+        servico.inativar();
+
+        servicoRepository.save(servico);
+    }
+
     private Servico validarServicoPorId(Long id) {
         return servicoRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Serviço não encontrada com ID: " + id));

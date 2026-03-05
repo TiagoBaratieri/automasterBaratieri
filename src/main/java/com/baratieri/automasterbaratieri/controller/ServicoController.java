@@ -60,4 +60,10 @@ public class ServicoController {
         return ResponseEntity.ok(servicoAtualizado);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluirServico(@PathVariable Long id) {
+        service.excluirServico(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

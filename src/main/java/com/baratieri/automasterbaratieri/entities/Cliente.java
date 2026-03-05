@@ -17,7 +17,7 @@ import static com.baratieri.automasterbaratieri.services.util.ValidadorUtil.vali
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Cliente {
+public class Cliente extends Inativavel{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -56,6 +56,13 @@ public class VeiculoService {
         return VeiculoResponseDTO.fromEntity(veiculo);
     }
 
+    @Transactional
+    public void excluirVeiculo(Long id) {
+        Veiculo veiculo = validarIdVeiculo(id);
+        veiculo.inativar();
+        veiculoRepository.save(veiculo);
+    }
+
     private Cliente validarClienteExistente(VeiculoRequestDTO dto) {
         return clienteRepository.findById(dto.idCliente())
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado com ID: " + dto.idCliente()));

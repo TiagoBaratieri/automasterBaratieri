@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Veiculo {
+public class Veiculo extends Inativavel{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

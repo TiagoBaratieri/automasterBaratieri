@@ -54,4 +54,10 @@ public class VeiculoController {
         return ResponseEntity.created(uri).body(veiculoDto);
 
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluirVeiculo(@PathVariable Long id) {
+        veiculoService.excluirVeiculo(id);
+        return ResponseEntity.noContent().build();
+    }
 }
