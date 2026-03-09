@@ -21,7 +21,7 @@ public class MecanicoService {
 
     @Transactional(readOnly = true)
     public MecanicoResponseDTO buscarMecanicoPorId(Long id) {
-        Mecanico mecanico = validarMecanicoId(id);
+        Mecanico mecanico = buscarOuFalhar(id);
         return MecanicoResponseDTO.fromEntity(mecanico);
     }
 
@@ -53,20 +53,20 @@ public class MecanicoService {
 
     @Transactional
     public void excluirMecanico(Long id) {
-        Mecanico mecanico = validarMecanicoId(id);
+        Mecanico mecanico = buscarOuFalhar(id);
         mecanico.inativar();
         mecanicoRepository.save(mecanico);
     }
 
     @Transactional
     public MecanicoResponseDTO atualizarMecanico(Long id, AtualizarMecanicoRequestDTO dto) {
-        Mecanico mecanico = validarMecanicoId(id);
+        Mecanico mecanico = buscarOuFalhar(id);
         mecanico.atualizarDados(dto.taxaComissao());
         return MecanicoResponseDTO.fromEntity(mecanicoRepository.save(mecanico));
     }
 
 
-    private Mecanico validarMecanicoId(Long id) {
+    public Mecanico buscarOuFalhar(Long id) {
         return mecanicoRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Mecânico não encontrada com ID: " + id));
 

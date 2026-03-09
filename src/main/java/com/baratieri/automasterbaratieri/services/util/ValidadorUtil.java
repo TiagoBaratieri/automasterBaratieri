@@ -1,9 +1,12 @@
 package com.baratieri.automasterbaratieri.services.util;
 
+import com.baratieri.automasterbaratieri.entities.ItemPeca;
+import com.baratieri.automasterbaratieri.entities.ItemServico;
 import com.baratieri.automasterbaratieri.enums.StatusOS;
 import com.baratieri.automasterbaratieri.services.exceptions.RegraNegocioException;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class ValidadorUtil {
     public static void validarDadosObrigatorio(String valor, String mensssagemErro) {
@@ -30,25 +33,6 @@ public class ValidadorUtil {
         }
     }
 
-    public static void validarStatusMecanico(Boolean status, String mensagemErro) {
-        if (status == null || !status) {
-            throw new RegraNegocioException(mensagemErro);
-
-        }
-    }
-
-    public static void validarStatusOrdemServicoFinalizadaOuCancelada(StatusOS status, String mensagemErro) {
-        if (status == StatusOS.FINALIZADO || status == StatusOS.CANCELADO) {
-            throw new RegraNegocioException(mensagemErro);
-        }
-    }
-
-
-    public static void validarStatusOrdemServicoFinalizado(StatusOS status, String mensagemErro) {
-        if (status == StatusOS.FINALIZADO)  {
-            throw new RegraNegocioException(mensagemErro);
-        }
-    }
 
     public static void validarStatusOrdemServicoOrcamento(StatusOS status, String mensagemErro) {
         if (status != StatusOS.ORCAMENTO)  {
@@ -62,6 +46,13 @@ public class ValidadorUtil {
         }
     }
 
+    public static void validarExistePecaOrdemServico(List<ItemServico> servicos, List<ItemPeca> pecas, String mensagemErro) {
+        boolean existePeca = pecas == null || pecas.isEmpty();
+        boolean existeServico = servicos == null || servicos.isEmpty();
+        if (existePeca && existeServico) {
+            throw new RegraNegocioException(mensagemErro);
+        }
+    }
 
 }
 

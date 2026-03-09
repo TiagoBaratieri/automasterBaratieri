@@ -156,6 +156,12 @@ public class OrdemServico {
         }
     }
 
+    public void validarPecasOrdemServicoAprovada(){
+        validarExistePecaOrdemServico(itensServico,itensPeca,
+                "Não é possível aprovar a Ordem de Serviço. " +
+                        "Adicione pelo menos uma Peça ou Serviço ao orçamento.");
+    }
+
     @PrePersist
     @PreUpdate
     public void garantirCalculoAntesDeSalvar() {

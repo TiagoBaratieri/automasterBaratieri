@@ -5,12 +5,15 @@ import com.baratieri.automasterbaratieri.dto.response.OrdemServicoResponseDTO;
 
 import com.baratieri.automasterbaratieri.enums.StatusOS;
 import com.baratieri.automasterbaratieri.services.OrdemServicoService;
+import com.baratieri.automasterbaratieri.services.RelatorioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -24,6 +27,23 @@ import java.net.URI;
 public class OrdemServicoController {
 
     private final OrdemServicoService ordemServicoService;
+    private final RelatorioService relatorioService;
+
+
+    @GetMapping("/{id}/relatorio")
+    public ResponseEntity<byte[]> baixarRelatorioOrdemServico(@PathVariable Long id) {
+
+        byte[] relatorioPdf = relatorioService.gerarPdfOrdemServico(id);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+
+        headers.setContentDispositionFormData("inline", "Ordem_Servico_" + id + ".pdf");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(relatorioPdf);
+    }
 
 
     @GetMapping("/{id}")

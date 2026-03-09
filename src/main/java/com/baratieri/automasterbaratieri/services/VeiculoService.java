@@ -25,7 +25,7 @@ public class VeiculoService {
 
     @Transactional(readOnly = true)
     public VeiculoResponseDTO buscarVeiculoPorId(Long id) {
-       Veiculo veiculo = validarIdVeiculo(id);
+       Veiculo veiculo = veiculoExiste(id);
        return VeiculoResponseDTO.fromEntity(veiculo);
     }
 
@@ -58,7 +58,7 @@ public class VeiculoService {
 
     @Transactional
     public void excluirVeiculo(Long id) {
-        Veiculo veiculo = validarIdVeiculo(id);
+        Veiculo veiculo = veiculoExiste(id);
         veiculo.inativar();
         veiculoRepository.save(veiculo);
     }
@@ -68,12 +68,12 @@ public class VeiculoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado com ID: " + dto.idCliente()));
     }
 
-    private Veiculo validarExistePlacaVeiculo(String placa) {
+    public Veiculo validarExistePlacaVeiculo(String placa) {
         return veiculoRepository.findByPlaca(placa)
                 .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado com a placa: " + placa));
     }
 
-    private Veiculo validarIdVeiculo(Long id) {
+    private Veiculo veiculoExiste(Long id) {
         return veiculoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Veiculo não encontrada com ID: " + id));
     }

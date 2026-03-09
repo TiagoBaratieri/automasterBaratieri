@@ -24,7 +24,7 @@ public class PecaService {
 
     @Transactional(readOnly = true)
     public PecaResponseDTO buscarPecaPorId(Long id) {
-        Peca peca = validarPecaId(id);
+        Peca peca = pecaExiste(id);
         return PecaResponseDTO.fromEntity(peca);
     }
 
@@ -62,14 +62,14 @@ public class PecaService {
 
     @Transactional
     public PecaResponseDTO atualizarPeca(Long id, AtualizarPecaRequestDTO dto) {
-        Peca peca = validarPecaId(id);
+        Peca peca = pecaExiste(id);
         peca.atualizarPeca(dto.precoVenda(),dto.precoCusto(),dto.estoqueMinimo());
         return PecaResponseDTO.fromEntity(peca);
     }
 
     @Transactional
     public void ExcluirPeca(Long id) {
-        Peca peca = validarPecaId(id);
+        Peca peca = pecaExiste(id);
         peca.inativar();
         pecaRepository.save(peca);
     }
@@ -87,7 +87,7 @@ public class PecaService {
         }
     }
 
-    private Peca validarPecaId(Long pecaId){
+    public Peca pecaExiste(Long pecaId){
         return pecaRepository.findById(pecaId).orElseThrow(() ->
                 new ResourceNotFoundException("Peça não encontrada com ID: " + pecaId));
 

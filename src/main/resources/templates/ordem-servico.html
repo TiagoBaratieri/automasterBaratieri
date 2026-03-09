@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Ordem de Serviço - AutoMaster</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 30px;
+            color: #333;
+            font-size: 14px;
+        }
+        .cabecalho {
+            text-align: center;
+            border-bottom: 2px solid #e74c3c;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .cabecalho h1 {
+            margin: 0;
+            color: #2c3e50;
+        }
+        .info-section {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .info-section table {
+            width: 100%;
+            border: none;
+        }
+        .info-section td {
+            padding: 5px 0;
+            border: none;
+        }
+
+        /* Estilos das Tabelas de Itens */
+        .tabela-itens {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 30px;
+        }
+        .tabela-itens th {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            text-align: left;
+            padding: 10px;
+            border-bottom: 2px solid #bdc3c7;
+        }
+        .tabela-itens td {
+            padding: 10px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .valores {
+            text-align: right;
+        }
+        .total-geral {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: right;
+            padding-top: 15px;
+            border-top: 2px solid #e74c3c;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+
+<div class="cabecalho">
+    <h1>OFICINA AUTOMASTER</h1>
+    <p>Ordem de Serviço Nº <strong th:text="${os.id}">000</strong> - <span th:text="${os.status}">STATUS</span></p>
+</div>
+
+<div class="info-section">
+    <table>
+        <tr>
+            <td width="50%">
+                <strong>Cliente:</strong> <span th:text="${os.veiculo.cliente.nome}">Nome do Cliente</span><br />
+                <strong>Telefone:</strong> <span th:text="${os.veiculo.cliente.telefone}">Telefone</span>
+            </td>
+            <td width="50%">
+                <strong>Veículo:</strong> <span th:text="${os.veiculo.marca} + ' ' + ${os.veiculo.modelo} + ' (' + ${os.veiculo.ano} + ')'">Modelo</span><br />
+                <strong>Placa:</strong> <span th:text="${os.veiculo.placa}">ABC-1234</span>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<h3>Serviços Realizados</h3>
+<table class="tabela-itens">
+    <thead>
+    <tr>
+        <th>Descrição</th>
+        <th>Mecânico</th>
+        <th class="valores">Qtd</th>
+        <th class="valores">Valor Unit.</th>
+        <th class="valores">Subtotal</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${os.itensServico}">
+        <td th:text="${item.servico.descricao}">Troca de Óleo</td>
+        <td th:text="${item.mecanicoResponsavel != null ? item.mecanicoResponsavel.nome : 'Não informado'}">Mecânico</td>
+        <td class="valores" th:text="${item.quantidade}">1</td>
+        <td class="valores">R$ <span th:text="${#numbers.formatDecimal(item.valorCobrado, 1, 'POINT', 2, 'COMMA')}">0,00</span></td>
+        <td class="valores">R$ <span th:text="${#numbers.formatDecimal(item.valorCobrado * item.quantidade, 1, 'POINT', 2, 'COMMA')}">0,00</span></td>
+    </tr>
+    </tbody>
+</table>
+
+<h3>Peças Utilizadas</h3>
+<table class="tabela-itens">
+    <thead>
+    <tr>
+        <th>Código (SKU)</th>
+        <th>Descrição da Peça</th>
+        <th class="valores">Qtd</th>
+        <th class="valores">Preço Unit.</th>
+        <th class="valores">Subtotal</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${os.itensPeca}">
+        <td th:text="${item.peca.sku}">SKU-123</td>
+        <td th:text="${item.peca.nome} + ' (' + ${item.peca.marca} + ')'">Filtro de Óleo (Fram)</td>
+        <td class="valores" th:text="${item.quantidade}">1</td>
+        <td class="valores">R$ <span th:text="${#numbers.formatDecimal(item.precoUnitario, 1, 'POINT', 2, 'COMMA')}">0,00</span></td>
+        <td class="valores">R$ <span th:text="${#numbers.formatDecimal(item.precoUnitario * item.quantidade, 1, 'POINT', 2, 'COMMA')}">0,00</span></td>
+    </tr>
+    </tbody>
+</table>
+
+<div class="total-geral">
+    TOTAL DO SERVIÇOS REALIZADOS.: R$ <span th:text="${#numbers.formatDecimal(os.valorTotal, 1, 'POINT', 2, 'COMMA')}">0,00</span>
+</div>
+
+</body>
+</html>

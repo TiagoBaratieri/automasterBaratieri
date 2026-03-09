@@ -23,12 +23,12 @@ public class OrdemServicoService {
 
     private final ItemServicoRepository itemServicoRepository;
     private final OrdemServicoRepository ordemServicoRepository;
-    private final MecanicoRepository mecanicoRepository;
-    private final VeiculoRepository veiculoRepository;
-    private final ServicoRepository servicoRepository;
     private final ItemPecaRepository itemPecaRepository;
-    private final PecaRepository pecaRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final ServicoService servicoService;
+    private final VeiculoService veiculoService;
+    private final PecaService pecaService;
+    private final MecanicoService mecanicoService;
 
 
     @Transactional(readOnly = true)
@@ -53,7 +53,7 @@ public class OrdemServicoService {
 
     @Transactional
     public OrdemServicoResponseDTO abrirOdemServico(AberturaOsRequestDTO dto) {
-        Veiculo veiculo = validarVeiculoExistente(dto);
+        Veiculo veiculo = veiculoService.validarExistePlacaVeiculo(dto.placaVeiculo());
         validarOrdemServicoAberta(veiculo);
 
         OrdemServico os = new OrdemServico(veiculo, dto.observacaoInicial());
@@ -61,13 +61,13 @@ public class OrdemServicoService {
     }
 
     @Transactional
-    public OrdemServicoResponseDTO adicionarServicoOrdemServico(Long osId, ServicoPayloadDTO payloadDTO) {
+    public OrdemServicoResponseDTO adicionarServicoOrdemServico(Long osId, ServicoPayloadDTO dto) {
         OrdemServico os = ordemServicoExiste(osId);
-        Servico servico = validarServicoExistente(payloadDTO);
-        Mecanico mecanico = validarMecanicoExistente(payloadDTO);
+        Servico servico = servicoService.servicoExiste(dto.servicoId());
+        Mecanico mecanico = mecanicoService.buscarOuFalhar(dto.mecanicoId());
 
-        ItemServico itemServico = new ItemServico(os, servico, mecanico, payloadDTO.valorCobrado(),
-                payloadDTO.quantidade(), payloadDTO.observacao());
+        ItemServico itemServico = new ItemServico(os, servico, mecanico, dto.valorCobrado(),
+                dto.quantidade(), dto.observacao());
 
         os.adicionarServico(itemServico);
         itemServicoRepository.save(itemServico);
@@ -77,12 +77,12 @@ public class OrdemServicoService {
     }
 
     @Transactional
-    public OrdemServicoResponseDTO adicionarPecaOrdemServico(Long osId, PecaPayloadDTO payload) {
+    public OrdemServicoResponseDTO adicionarPecaOrdemServico(Long osId, PecaPayloadDTO dto) {
         OrdemServico os = ordemServicoExiste(osId);
-        Peca peca = validarPecaExistente(payload);
-        peca.baixarEstoque(payload.quantidade());
+        Peca peca = pecaService.pecaExiste(dto.pecaId());
+        peca.baixarEstoque(dto.quantidade());
         verificarEDispararEventoEstoque(peca);
-        ItemPeca itemPeca = new ItemPeca(os, peca, payload.quantidade(), payload.valorUnitario());
+        ItemPeca itemPeca = new ItemPeca(os, peca, dto.quantidade(), dto.valorUnitario());
 
         os.adicionarPecaOrdemServico(itemPeca);
         itemPecaRepository.save(itemPeca);
@@ -135,6 +135,7 @@ public class OrdemServicoService {
     public OrdemServicoResponseDTO aprovarOrdemServico(Long id) {
         OrdemServico os = ordemServicoExiste(id);
         os.aprovarOrcamento();
+        os.validarPecasOrdemServicoAprovada();
         os = ordemServicoRepository.save(os);
         return OrdemServicoResponseDTO.fromEntity(os);
     }
@@ -157,34 +158,11 @@ public class OrdemServicoService {
         }
     }
 
-    private OrdemServico ordemServicoExiste(Long id) {
+    public OrdemServico ordemServicoExiste(Long id) {
         return ordemServicoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ordem de Serviço não encontrada com ID: " + id));
     }
 
-    private Veiculo validarVeiculoExistente(AberturaOsRequestDTO dto) {
-        return veiculoRepository.findByPlaca(dto.placaVeiculo())
-                .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado com a placa: " +
-                        dto.placaVeiculo()));
-    }
-
-    private Servico validarServicoExistente(ServicoPayloadDTO dto) {
-        return servicoRepository.findById(dto.servicoId())
-                .orElseThrow(() -> new ResourceNotFoundException("Serviço não encontrado no catálogo com ID: " + dto.servicoId()));
-
-    }
-
-    private Mecanico validarMecanicoExistente(ServicoPayloadDTO dto) {
-        return mecanicoRepository.findByIdAndAtivoTrue(dto.mecanicoId())
-                .orElseThrow(() -> new ResourceNotFoundException("Mecânico não encontrado ou Inativo. Verifique se o cadastro está ativo."
-                ));
-    }
-
-    private Peca validarPecaExistente(PecaPayloadDTO dto) {
-        return pecaRepository.findById(dto.pecaId())
-                .orElseThrow(() -> new ResourceNotFoundException("Peça não encontrada."));
-
-    }
 
     private ItemPeca validarItemPecaExistente(Long id) {
         return itemPecaRepository.findById(id)

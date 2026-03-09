@@ -20,7 +20,7 @@ public class ServicoService {
 
     @Transactional(readOnly = true)
     public ServicoResponseDTO buscarServicoPorId(Long id) {
-        Servico servico = validarServicoPorId(id);
+        Servico servico = servicoExiste(id);
         return ServicoResponseDTO.fromEntity(servico);
     }
 
@@ -42,7 +42,7 @@ public class ServicoService {
 
     @Transactional
     public ServicoResponseDTO atualizarServico(Long id, ServicoRequestDTO dto) {
-        Servico servico = validarServicoPorId(id);
+        Servico servico = servicoExiste(id);
         validarDescricaoExiste(dto);
         servico.preencherDados(dto.descricao(), dto.valorMaoDeObraBase());
         return ServicoResponseDTO.fromEntity(servico);
@@ -50,16 +50,15 @@ public class ServicoService {
 
     @Transactional
     public void excluirServico(Long id) {
-        Servico servico = validarServicoPorId(id);
+        Servico servico = servicoExiste(id);
         servico.inativar();
 
         servicoRepository.save(servico);
     }
 
-    private Servico validarServicoPorId(Long id) {
-        return servicoRepository.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Serviço não encontrada com ID: " + id));
-
+    public Servico servicoExiste(Long id) {
+        return servicoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Serviço não encontrado no catálogo com ID: " + id));
     }
 
     private void validarDescricaoExiste(ServicoRequestDTO dto) {
