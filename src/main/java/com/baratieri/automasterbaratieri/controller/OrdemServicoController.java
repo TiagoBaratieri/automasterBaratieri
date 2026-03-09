@@ -45,7 +45,6 @@ public class OrdemServicoController {
                 .body(relatorioPdf);
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<OrdemServicoResponseDTO> buscarOrdemServicoPorId(@PathVariable Long id) {
         return ResponseEntity.ok(ordemServicoService.buscarOrdemServicoPorId(id));
@@ -121,6 +120,12 @@ public class OrdemServicoController {
     public ResponseEntity<OrdemServicoResponseDTO> aprovarOrdemServico(@PathVariable Long id) {
         OrdemServicoResponseDTO responseDTO = ordemServicoService.aprovarOrdemServico(id);
         return ResponseEntity.ok(responseDTO);
+    }
+
+    @PostMapping("/{id}/enviar-orcamento")
+    public ResponseEntity<Void> enviarOrcamentoParaCliente(@PathVariable Long id) {
+        ordemServicoService.enviarOrcamento(id);
+        return ResponseEntity.accepted().build();
     }
 
     @PutMapping("/{id}/finalizar")

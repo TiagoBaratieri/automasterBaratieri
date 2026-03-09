@@ -52,7 +52,7 @@ public class OrdemServico {
         this.veiculo = veiculo;
         this.descricao = descricao;
         this.dataAbertura = LocalDateTime.now();
-        this.status = StatusOS.ORCAMENTO;
+        this.status = StatusOS.AGUARDANDO_APROVACAO;
 
     }
 
@@ -150,14 +150,18 @@ public class OrdemServico {
         dataFechamento = LocalDateTime.now();
     }
 
+    public void aguardarOs() {
+        status = StatusOS.AGUARDANDO_APROVACAO;
+    }
+
     private void validarStatusOrdemServicoFinalizadaOuCancelada() {
         if (status == StatusOS.FINALIZADO || status == StatusOS.CANCELADO) {
             throw new RegraNegocioException("Não é possível adicionar peças em uma OS encerrada ou cancelada.");
         }
     }
 
-    public void validarPecasOrdemServicoAprovada(){
-        validarExistePecaOrdemServico(itensServico,itensPeca,
+    public void validarPecasOrdemServicoAprovada() {
+        validarExistePecaOrdemServico(itensServico, itensPeca,
                 "Não é possível aprovar a Ordem de Serviço. " +
                         "Adicione pelo menos uma Peça ou Serviço ao orçamento.");
     }

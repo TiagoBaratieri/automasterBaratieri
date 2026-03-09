@@ -5,6 +5,8 @@ import com.baratieri.automasterbaratieri.dto.response.OrdemServicoResponseDTO;
 import com.baratieri.automasterbaratieri.entities.*;
 import com.baratieri.automasterbaratieri.enums.StatusOS;
 import com.baratieri.automasterbaratieri.eventos.EstoqueBaixoEvento;
+import com.baratieri.automasterbaratieri.eventos.OrcamentoProntoEvento;
+import com.baratieri.automasterbaratieri.eventos.OrdemServicoAprovadaEvento;
 import com.baratieri.automasterbaratieri.repositories.*;
 import com.baratieri.automasterbaratieri.services.exceptions.RegraNegocioException;
 import com.baratieri.automasterbaratieri.services.exceptions.ResourceNotFoundException;
@@ -137,7 +139,17 @@ public class OrdemServicoService {
         os.aprovarOrcamento();
         os.validarPecasOrdemServicoAprovada();
         os = ordemServicoRepository.save(os);
+        eventPublisher.publishEvent(new OrdemServicoAprovadaEvento(os));
         return OrdemServicoResponseDTO.fromEntity(os);
+    }
+
+    @Transactional
+    public void enviarOrcamento(Long osId) {
+        OrdemServico os = ordemServicoExiste(osId);
+        os.validarPecasOrdemServicoAprovada();
+        os.aguardarOs();
+        ordemServicoRepository.save(os);
+        eventPublisher.publishEvent(new OrcamentoProntoEvento(os));
     }
 
     @Transactional

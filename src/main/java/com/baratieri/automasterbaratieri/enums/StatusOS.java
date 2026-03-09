@@ -5,7 +5,7 @@ import java.util.List;
 
 public enum StatusOS {
     // 1. O.S. criada, aguardando cliente autorizar
-    ORCAMENTO,
+    AGUARDANDO_APROVACAO,
 
     // 2. Cliente autorizou, peças reservadas no estoque
     APROVADO,
@@ -20,6 +20,6 @@ public enum StatusOS {
     CANCELADO;
 
     public static List<StatusOS> getAtivos() {
-        return List.of(ORCAMENTO, APROVADO, EM_EXECUCAO);
+        return List.of(APROVADO,AGUARDANDO_APROVACAO, EM_EXECUCAO);
     }
 }

@@ -35,7 +35,7 @@ public class ValidadorUtil {
 
 
     public static void validarStatusOrdemServicoOrcamento(StatusOS status, String mensagemErro) {
-        if (status != StatusOS.ORCAMENTO)  {
+        if (status != StatusOS.AGUARDANDO_APROVACAO)  {
             throw new RegraNegocioException(mensagemErro);
         }
     }
