@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-import static com.baratieri.automasterbaratieri.services.util.ValidadorUtil.*;
+import static com.baratieri.automasterbaratieri.services.util.ValidacaoDominio.*;
 
 @Entity
 @Data

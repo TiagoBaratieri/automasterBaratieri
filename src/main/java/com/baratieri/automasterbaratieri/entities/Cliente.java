@@ -10,7 +10,7 @@ import java.util.List;
 
 import static com.baratieri.automasterbaratieri.services.util.FormatacaoUtil.formatarEmail;
 import static com.baratieri.automasterbaratieri.services.util.FormatacaoUtil.formatarTextoOpcional;
-import static com.baratieri.automasterbaratieri.services.util.ValidadorUtil.validarDadosObrigatorio;
+import static com.baratieri.automasterbaratieri.services.util.ValidacaoDominio.validarDadosObrigatorio;
 
 
 @Entity

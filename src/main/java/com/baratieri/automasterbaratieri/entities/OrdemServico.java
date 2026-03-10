@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static com.baratieri.automasterbaratieri.services.util.ValidadorUtil.*;
 
 @Entity
 @Data
@@ -120,7 +119,9 @@ public class OrdemServico {
     }
 
     public void atualizarDescricaoServico(String descricao) {
-        validarDadosObrigatorio(descricao, "A descrição do serviço é obrigatória.");
+        if (descricao == null || descricao.trim().isEmpty()) {
+            throw new RegraNegocioException("A descrição do serviço é obrigatória.");
+        }
         this.descricao = descricao;
     }
 
@@ -137,15 +138,16 @@ public class OrdemServico {
     }
 
     public void aprovarOrcamento() {
-        validarStatusOrdemServicoOrcamento(status, "Essa OS não pode ser iniciada pois está: "
-                + status);
+        if (this.status != StatusOS.AGUARDANDO_APROVACAO) {
+            throw new RegraNegocioException("Essa OS não pode ser iniciada pois está: " + this.status);
+        }
         status = StatusOS.EM_EXECUCAO;
     }
 
     public void finalizarOs() {
-        validarStatusOrdemServicoEmExecucao(status, "Não é possível finalizar uma O.S. com status " + status +
-                ". A O.S. precisa estar EM_EXECUCAO.");
-
+        if (this.status != StatusOS.EM_EXECUCAO) {
+            throw new RegraNegocioException("Não é possível finalizar uma O.S. com status " + this.status + ". A O.S. precisa estar EM_EXECUCAO.");
+        }
         status = StatusOS.FINALIZADO;
         dataFechamento = LocalDateTime.now();
     }
@@ -161,9 +163,12 @@ public class OrdemServico {
     }
 
     public void validarPecasOrdemServicoAprovada() {
-        validarExistePecaOrdemServico(itensServico, itensPeca,
-                "Não é possível aprovar a Ordem de Serviço. " +
-                        "Adicione pelo menos uma Peça ou Serviço ao orçamento.");
+        boolean semPecas = this.itensPeca == null || this.itensPeca.isEmpty();
+        boolean semServicos = this.itensServico == null || this.itensServico.isEmpty();
+
+        if (semPecas && semServicos) {
+            throw new RegraNegocioException("Não é possível aprovar a Ordem de Serviço. Adicione pelo menos uma Peça ou Serviço ao orçamento.");
+        }
     }
 
     @PrePersist
