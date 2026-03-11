@@ -164,14 +164,9 @@ public class OrdemServico {
 
     public void aguardarOs() {
         status = StatusOS.AGUARDANDO_APROVACAO;
-
-        if (orcamentoAlterado) {
-            orcamentoRevisado = true;
-        }
-
+        orcamentoRevisado = true;
         orcamentoAlterado = false;
     }
-
 
     public void validarPecasOrdemServicoAprovada() {
         boolean semPecas = itensPeca == null || itensPeca.isEmpty();
@@ -205,12 +200,10 @@ public class OrdemServico {
             throw new RegraNegocioException("Não é possível adicionar peças em uma OS encerrada ou cancelada.");
         }
     }
-
     private void ordemServicoAguardandoAprovacaoOuExecucao() {
-        if (status == StatusOS.AGUARDANDO_APROVACAO || status == StatusOS.EM_EXECUCAO) {
+        if (status == StatusOS.EM_EXECUCAO || (status == StatusOS.AGUARDANDO_APROVACAO && orcamentoRevisado)) {
             orcamentoAlterado = true;
         }
-
     }
 
     @PrePersist
