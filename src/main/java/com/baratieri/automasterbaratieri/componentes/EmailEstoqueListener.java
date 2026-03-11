@@ -15,10 +15,10 @@ public class EmailEstoqueListener {
 
     private final JavaMailSender mailSender;
 
-    @Value("${automaster.notificacao.estoque.remetente}")
+    @Value("${spring.mail.username}")
     private String emailRemetente;
 
-    @Value("${automaster.notificacao.estoque.destinatario}")
+    @Value("${spring.mail.username}")
     private String emailDestinatario;
 
     @Async

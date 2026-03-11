@@ -123,8 +123,9 @@ public class OrdemServicoController {
     }
 
     @PostMapping("/{id}/enviar-orcamento")
-    public ResponseEntity<Void> enviarOrcamentoParaCliente(@PathVariable Long id) {
-        ordemServicoService.enviarOrcamento(id);
+    public ResponseEntity<Void> enviarOrcamentoParaCliente(@PathVariable Long id,
+                                                           @RequestParam(required = false)String motivo) {
+        ordemServicoService.enviarOrcamento(id, motivo);
         return ResponseEntity.accepted().build();
     }
 

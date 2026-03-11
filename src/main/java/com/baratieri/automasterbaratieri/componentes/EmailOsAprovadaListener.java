@@ -23,7 +23,7 @@ public class EmailOsAprovadaListener {
 
     private final RelatorioService relatorioService;
 
-    @Value("${automaster.notificacao.estoque.destinatario}")
+    @Value("${spring.mail.username}")
     private String emailDestinatario;
 
     @Async

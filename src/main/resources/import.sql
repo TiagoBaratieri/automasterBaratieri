@@ -25,7 +25,6 @@ INSERT INTO veiculo (placa, modelo, marca, ano, cliente_id,ativo) VALUES ('XYZ98
 INSERT INTO veiculo (placa, modelo, marca, ano, cliente_id,ativo) VALUES ('MER2004', 'Meriva 1.8', 'Chevrolet', 2004, 3,true);
 INSERT INTO veiculo (placa, modelo, marca, ano, cliente_id,ativo) VALUES ('LAN0250', 'Lander 250', 'Yamaha', 2020, 3,true);
 
-INSERT INTO veiculo (placa, modelo, marca, ano, cliente_id, ativo) VALUES ('LAN0250', 'Lander 250', 'Yamaha', 2020, 3, true);
 -- 4. ORDENS DE SERVIÇO E ITENS
 INSERT INTO ordem_servico (veiculo_id, status, data_abertura, descricao, valor_total) VALUES (1, 'AGUARDANDO_APROVACAO', CURRENT_TIMESTAMP, 'Cliente relatou barulho ao frear e pediu troca de óleo', 0.00);
 INSERT INTO ordem_servico (veiculo_id, status, data_abertura, descricao, valor_total) VALUES (3, 'EM_EXECUCAO', CURRENT_TIMESTAMP, 'Veículo falhando em baixa rotação e consumindo muito combustível', 0.00);

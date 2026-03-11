@@ -23,7 +23,7 @@ public class EmailOrcamentoListener {
 
     private final RelatorioService relatorioService;
 
-    @Value("${automaster.notificacao.estoque.remetente}")
+    @Value("${spring.mail.username}")
     private String emailRemetente;
 
     @Async
@@ -32,11 +32,13 @@ public class EmailOrcamentoListener {
         try {
             OrdemServico os = evento.os();
 
+            String motivo = evento.motivo();
+
             byte[] pdf = relatorioService.gerarPdfOrdemServico(os.getId());
 
             MimeMessage message = mailSender.createMimeMessage();
 
-            MimeMessageHelper helper = getMimeMessageHelper(message, os);
+            MimeMessageHelper helper = getMimeMessageHelper(message, os, motivo);
 
             helper.addAttachment("Ordem_Servico_" + os.getId() + ".pdf", new ByteArrayResource(pdf));
 
@@ -44,24 +46,36 @@ public class EmailOrcamentoListener {
             System.out.println("Ficheiro PDF da O.S. enviado com sucesso para o cliente!");
 
         } catch (Exception e) {
-
             System.err.println("ERRO DE INFRAESTRUTURA: O orçamento foi salvo, mas o e-mail falhou. Motivo: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private @NonNull MimeMessageHelper getMimeMessageHelper(MimeMessage message, OrdemServico os) throws MessagingException {
+    private @NonNull MimeMessageHelper getMimeMessageHelper(MimeMessage message, OrdemServico os, String motivo) throws MessagingException {
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
         helper.setFrom(emailRemetente);
-
         helper.setTo(os.getVeiculo().getCliente().getEmail());
 
-        helper.setSubject("Orçamento para Avaliação - AutoMaster - OS Nº " + os.getId());
-        helper.setText("Olá, " + os.getVeiculo().getCliente().getNome() + "!\n\n" +
-                "O orçamento para a manutenção do seu veículo já está pronto. " +
-                "Confira o PDF em anexo com a lista de peças, serviços e o valor total.\n\n" +
-                "Por favor, responda a este e-mail aprovando o serviço para iniciarmos os trabalhos.");
+        String assunto = (motivo != null && !motivo.isBlank())
+                ? "⚠️ Orçamento ATUALIZADO para Avaliação - AutoMaster - OS Nº " + os.getId()
+                : "Orçamento para Avaliação - AutoMaster - OS Nº " + os.getId();
+
+        String textoBase = "Olá, " + os.getVeiculo().getCliente().getNome() + "!\n\n";
+
+        if (motivo != null && !motivo.isBlank()) {
+            textoBase += "O orçamento da sua manutenção precisou ser ATUALIZADO.\n" +
+                    "Motivo da alteração: " + motivo + "\n\n";
+        } else {
+            textoBase += "O orçamento para a manutenção do seu veículo já está pronto.\n\n";
+        }
+
+        textoBase += "Confira o PDF em anexo com a lista de peças, serviços e o valor total.\n" +
+                "Por favor, responda a este e-mail aprovando para darmos continuidade aos trabalhos.";
+
+        helper.setSubject(assunto);
+        helper.setText(textoBase);
+
         return helper;
     }
 }

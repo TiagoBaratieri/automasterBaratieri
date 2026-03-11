@@ -144,12 +144,12 @@ public class OrdemServicoService {
     }
 
     @Transactional
-    public void enviarOrcamento(Long osId) {
+    public void enviarOrcamento(Long osId,String motivo) {
         OrdemServico os = ordemServicoExiste(osId);
         os.validarPecasOrdemServicoAprovada();
         os.aguardarOs();
         ordemServicoRepository.save(os);
-        eventPublisher.publishEvent(new OrcamentoProntoEvento(os));
+        eventPublisher.publishEvent(new OrcamentoProntoEvento(os, motivo));
     }
 
     @Transactional
