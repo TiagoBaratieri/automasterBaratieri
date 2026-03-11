@@ -40,6 +40,12 @@ public class OrdemServico {
     @Column(name = "valor_total")
     private BigDecimal valorTotal = BigDecimal.ZERO;
 
+    @Column(name = "orcamento_alterado", nullable = false, columnDefinition = "boolean default false")
+    private boolean orcamentoAlterado = false;
+
+    @Column(name = "orcamento_revisado", nullable = false, columnDefinition = "boolean default false")
+    private boolean orcamentoRevisado = false;
+
     @OneToMany(mappedBy = "ordemServico", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ItemPeca> itensPeca = new ArrayList<>();
 
@@ -57,12 +63,14 @@ public class OrdemServico {
 
     public void adicionarPecaOrdemServico(ItemPeca item) {
         validarStatusOrdemServicoFinalizadaOuCancelada();
+        ordemServicoAguardandoAprovacaoOuExecucao();
         itensPeca.add(item);
         calcularTotal();
     }
 
     public void adicionarServico(ItemServico item) {
         validarStatusOrdemServicoFinalizadaOuCancelada();
+        ordemServicoAguardandoAprovacaoOuExecucao();
         itensServico.add(item);
         calcularTotal();
     }
@@ -72,6 +80,7 @@ public class OrdemServico {
             throw new RegraNegocioException("O item de peça não pode ser nulo.");
         }
         validarStatusOrdemServicoFinalizadaOuCancelada();
+        ordemServicoAguardandoAprovacaoOuExecucao();
         if (!itensPeca.contains(item)) {
             throw new RegraNegocioException("Este item de peça não pertence a esta Ordem de Serviço.");
         }
@@ -86,6 +95,7 @@ public class OrdemServico {
             throw new RegraNegocioException("O item de serviço não pode ser nulo.");
         }
         validarStatusOrdemServicoFinalizadaOuCancelada();
+        ordemServicoAguardandoAprovacaoOuExecucao();
 
         if (!itensServico.contains(item)) {
             throw new RegraNegocioException("Este item de serviço não pertence a esta Ordem de Serviço.");
@@ -138,15 +148,15 @@ public class OrdemServico {
     }
 
     public void aprovarOrcamento() {
-        if (this.status != StatusOS.AGUARDANDO_APROVACAO) {
+        if (status != StatusOS.AGUARDANDO_APROVACAO) {
             throw new RegraNegocioException("Essa OS não pode ser iniciada pois está: " + this.status);
         }
         status = StatusOS.EM_EXECUCAO;
     }
 
     public void finalizarOs() {
-        if (this.status != StatusOS.EM_EXECUCAO) {
-            throw new RegraNegocioException("Não é possível finalizar uma O.S. com status " + this.status + ". A O.S. precisa estar EM_EXECUCAO.");
+        if (status != StatusOS.EM_EXECUCAO) {
+            throw new RegraNegocioException("Não é possível finalizar uma O.S. com status " + status + ". A O.S. precisa estar EM_EXECUCAO.");
         }
         status = StatusOS.FINALIZADO;
         dataFechamento = LocalDateTime.now();
@@ -154,6 +164,40 @@ public class OrdemServico {
 
     public void aguardarOs() {
         status = StatusOS.AGUARDANDO_APROVACAO;
+
+        if (orcamentoAlterado) {
+            orcamentoRevisado = true;
+        }
+
+        orcamentoAlterado = false;
+    }
+
+
+    public void validarPecasOrdemServicoAprovada() {
+        boolean semPecas = itensPeca == null || itensPeca.isEmpty();
+        boolean semServicos = itensServico == null || itensServico.isEmpty();
+
+        if (semPecas && semServicos) {
+            throw new RegraNegocioException("Não é possível aprovar a Ordem de Serviço. Adicione pelo menos uma Peça ou Serviço ao orçamento.");
+        }
+
+    }
+
+    public void validarReenvioOrcamento(String motivo) {
+        boolean temMotivo = motivo != null && !motivo.isBlank();
+        if (!orcamentoAlterado && temMotivo) {
+            throw new RegraNegocioException("Não é possível classificar como 'Atualizado'. " +
+                    "Nenhuma peça ou serviço foi alterado nesta O.S. Se deseja apenas reenviar o e-mail original, deixe o motivo em branco.");
+        }
+
+        if (orcamentoAlterado && !temMotivo) {
+            throw new RegraNegocioException("O orçamento desta O.S. sofreu alterações." +
+                    " É obrigatório informar o 'motivo' para enviar ao cliente.");
+        }
+
+        if (orcamentoRevisado && !orcamentoAlterado && !temMotivo) {
+            throw new RegraNegocioException("Este orçamento já é uma versão atualizada. Para reenviar a 2ª via, é obrigatório preencher o motivo (Ex: 'Reenvio do orçamento com a bomba de água').");
+        }
     }
 
     private void validarStatusOrdemServicoFinalizadaOuCancelada() {
@@ -162,13 +206,11 @@ public class OrdemServico {
         }
     }
 
-    public void validarPecasOrdemServicoAprovada() {
-        boolean semPecas = this.itensPeca == null || this.itensPeca.isEmpty();
-        boolean semServicos = this.itensServico == null || this.itensServico.isEmpty();
-
-        if (semPecas && semServicos) {
-            throw new RegraNegocioException("Não é possível aprovar a Ordem de Serviço. Adicione pelo menos uma Peça ou Serviço ao orçamento.");
+    private void ordemServicoAguardandoAprovacaoOuExecucao() {
+        if (status == StatusOS.AGUARDANDO_APROVACAO || status == StatusOS.EM_EXECUCAO) {
+            orcamentoAlterado = true;
         }
+
     }
 
     @PrePersist

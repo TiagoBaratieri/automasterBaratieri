@@ -26,9 +26,9 @@ INSERT INTO veiculo (placa, modelo, marca, ano, cliente_id,ativo) VALUES ('MER20
 INSERT INTO veiculo (placa, modelo, marca, ano, cliente_id,ativo) VALUES ('LAN0250', 'Lander 250', 'Yamaha', 2020, 3,true);
 
 -- 4. ORDENS DE SERVIÇO E ITENS
-INSERT INTO ordem_servico (veiculo_id, status, data_abertura, descricao, valor_total) VALUES (1, 'AGUARDANDO_APROVACAO', CURRENT_TIMESTAMP, 'Cliente relatou barulho ao frear e pediu troca de óleo', 0.00);
-INSERT INTO ordem_servico (veiculo_id, status, data_abertura, descricao, valor_total) VALUES (3, 'EM_EXECUCAO', CURRENT_TIMESTAMP, 'Veículo falhando em baixa rotação e consumindo muito combustível', 0.00);
-INSERT INTO ordem_servico (veiculo_id, status, data_abertura, descricao, valor_total) VALUES (4, 'FINALIZADO', CURRENT_TIMESTAMP, 'Corrente patinando, solicitada troca do kit relação completo', 0.00);
+INSERT INTO ordem_servico (veiculo_id, status, data_abertura, descricao, valor_total,orcamento_alterado,orcamento_revisado) VALUES (1, 'AGUARDANDO_APROVACAO', CURRENT_TIMESTAMP, 'Cliente relatou barulho ao frear e pediu troca de óleo', 0.00,false,false);
+INSERT INTO ordem_servico (veiculo_id, status, data_abertura, descricao, valor_total,orcamento_alterado,orcamento_revisado) VALUES (3, 'EM_EXECUCAO', CURRENT_TIMESTAMP, 'Veículo falhando em baixa rotação e consumindo muito combustível', 0.00,false,false);
+INSERT INTO ordem_servico (veiculo_id, status, data_abertura, descricao, valor_total,orcamento_alterado,orcamento_revisado) VALUES (4, 'FINALIZADO', CURRENT_TIMESTAMP, 'Corrente patinando, solicitada troca do kit relação completo', 0.00,false,false);
 
 -- ITENS DA OS 1
 INSERT INTO item_peca (ordem_servico_id, peca_id, quantidade, preco_unitario) VALUES (1, 1, 1, 45.00);

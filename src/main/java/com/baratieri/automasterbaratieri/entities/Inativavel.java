@@ -12,10 +12,10 @@ public abstract class Inativavel {
     private Boolean ativo = true;
 
     public void inativar() {
-        this.ativo = false;
+        ativo = false;
     }
 
     public void ativar() {
-        this.ativo = true;
+        ativo = true;
     }
 }

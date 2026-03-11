@@ -147,6 +147,7 @@ public class OrdemServicoService {
     public void enviarOrcamento(Long osId,String motivo) {
         OrdemServico os = ordemServicoExiste(osId);
         os.validarPecasOrdemServicoAprovada();
+        os.validarReenvioOrcamento(motivo);
         os.aguardarOs();
         ordemServicoRepository.save(os);
         eventPublisher.publishEvent(new OrcamentoProntoEvento(os, motivo));

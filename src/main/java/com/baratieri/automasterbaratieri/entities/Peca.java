@@ -88,7 +88,7 @@ public class Peca extends Inativavel{
     }
 
     public boolean precisaReporEstoque() {
-        return this.quantidadeEstoque <= this.estoqueMinimo;
+        return quantidadeEstoque <= estoqueMinimo;
     }
 
     private void verificarQuantidadeEstoque(Integer quantidade) {
