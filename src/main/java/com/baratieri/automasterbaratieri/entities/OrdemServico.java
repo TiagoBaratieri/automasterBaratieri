@@ -136,7 +136,7 @@ public class OrdemServico {
     }
 
     public void cancelarOs() {
-        validarStatusOrdemServicoFinalizadaOuCancelada();
+        validarCancelamento();
         status = StatusOS.CANCELADO;
         dataFechamento = LocalDateTime.now();
     }
@@ -148,8 +148,20 @@ public class OrdemServico {
     }
 
     public void aprovarOrcamento() {
+        if (this.status == StatusOS.FINALIZADO) {
+            throw new RegraNegocioException("Esta Ordem de Serviço já foi finalizada e entregue. Não é possível aprová-la novamente.");
+        }
+
+        if (status == StatusOS.CANCELADO) {
+            throw new RegraNegocioException("Não é possível aprovar um orçamento de uma Ordem de Serviço que foi cancelada.");
+        }
+
+        if (status == StatusOS.EM_EXECUCAO) {
+            throw new RegraNegocioException("Este orçamento já foi aprovado anteriormente e o serviço encontra-se em execução.");
+        }
+
         if (status != StatusOS.AGUARDANDO_APROVACAO) {
-            throw new RegraNegocioException("Essa OS não pode ser iniciada pois está: " + this.status);
+            throw new RegraNegocioException("Apenas orçamentos com status AGUARDANDO_APROVACAO podem ser aprovados.");
         }
         status = StatusOS.EM_EXECUCAO;
     }
@@ -200,6 +212,17 @@ public class OrdemServico {
             throw new RegraNegocioException("Não é possível adicionar peças em uma OS encerrada ou cancelada.");
         }
     }
+
+    private void validarCancelamento() {
+        if (this.status == StatusOS.FINALIZADO) {
+            throw new RegraNegocioException("Não é possível cancelar uma Ordem de Serviço que já foi finalizada e entregue ao cliente.");
+        }
+
+        if (this.status == StatusOS.CANCELADO) {
+            throw new RegraNegocioException("Esta Ordem de Serviço já se encontra cancelada.");
+        }
+    }
+
     private void ordemServicoAguardandoAprovacaoOuExecucao() {
         if (status == StatusOS.EM_EXECUCAO || (status == StatusOS.AGUARDANDO_APROVACAO && orcamentoRevisado)) {
             orcamentoAlterado = true;
