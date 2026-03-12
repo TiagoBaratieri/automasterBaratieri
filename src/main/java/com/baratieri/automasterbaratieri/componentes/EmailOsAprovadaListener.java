@@ -40,7 +40,6 @@ public class EmailOsAprovadaListener {
 
             helper.setFrom(emailDestinatario);
 
-            // Aqui assumo que o Cliente tem um atributo de e-mail mapeado
             helper.setTo(os.getVeiculo().getCliente().getEmail());
 
             helper.setSubject("Orçamento Aprovado - AutoMaster - OS Nº " + os.getId());

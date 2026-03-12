@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.baratieri.automasterbaratieri.util.ValidacaoDominio.validarValorMaiorQueZero;
+
 
 @Entity
 @Data
@@ -52,6 +54,8 @@ public class OrdemServico {
     @OneToMany(mappedBy = "ordemServico", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ItemServico> itensServico = new ArrayList<>();
 
+    @OneToMany(mappedBy = "ordemServico", cascade = CascadeType.ALL)
+    private List<Pagamento> pagamentos = new ArrayList<>();
 
     public OrdemServico(Veiculo veiculo, String descricao) {
         this.veiculo = veiculo;
@@ -126,6 +130,21 @@ public class OrdemServico {
         }
 
         this.valorTotal = totalPecas.add(totalServicos);
+    }
+
+    public void adicionarPagamentoOrdemServico(Pagamento pagamento ) {
+        BigDecimal totalJaPago = pagamentos.stream()
+                .map(Pagamento::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal saldoDevedor = valorTotal.subtract(totalJaPago);
+
+        validarValorMaiorQueZero(saldoDevedor,
+                "Esta Ordem de Serviço já se encontra totalmente paga.");
+
+        validarSeValorNaoExcedeSaldo(pagamento, saldoDevedor);
+        pagamentos.add(pagamento);
+
     }
 
     public void atualizarDescricaoServico(String descricao) {
@@ -207,6 +226,13 @@ public class OrdemServico {
         }
     }
 
+    public void validarPagamentoApenasOrdemServicoFinalizada() {
+        if (status != StatusOS.FINALIZADO) {
+            throw new RegraNegocioException("Só é possível registrar pagamento para uma O.S. que esteja finalizada.");
+        }
+    }
+
+
     private void validarStatusOrdemServicoFinalizadaOuCancelada() {
         if (status == StatusOS.FINALIZADO || status == StatusOS.CANCELADO) {
             throw new RegraNegocioException("Não é possível adicionar peças em uma OS encerrada ou cancelada.");
@@ -229,10 +255,24 @@ public class OrdemServico {
         }
     }
 
+    private void validarSeValorNaoExcedeSaldo(Pagamento novoPagamento, BigDecimal saldoDevedor) {
+        if (!(novoPagamento instanceof PagamentoDinheiro)) {
+            if (novoPagamento.getValor().compareTo(saldoDevedor) > 0) {
+                throw new RegraNegocioException("O valor do pagamento (" + novoPagamento.getValor() +
+                        ") não pode ser maior que o saldo devedor atual (" + saldoDevedor + ").");
+            }
+        }
+
+        BigDecimal saldoRestante = saldoDevedor.subtract(novoPagamento.getValor());
+        if (saldoRestante.compareTo(BigDecimal.ZERO) == 0) {
+            this.status = StatusOS.PAGO;
+        }
+    }
+
     @PrePersist
     @PreUpdate
     public void garantirCalculoAntesDeSalvar() {
         this.calcularTotal();
     }
-
 }
+

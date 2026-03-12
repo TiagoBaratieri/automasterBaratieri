@@ -1,4 +1,4 @@
-package com.baratieri.automasterbaratieri.services.util;
+package com.baratieri.automasterbaratieri.util;
 
 import com.baratieri.automasterbaratieri.services.exceptions.RegraNegocioException;
 import lombok.AccessLevel;

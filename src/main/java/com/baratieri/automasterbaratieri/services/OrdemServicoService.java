@@ -11,7 +11,7 @@ import com.baratieri.automasterbaratieri.repositories.*;
 import com.baratieri.automasterbaratieri.services.exceptions.RegraNegocioException;
 import com.baratieri.automasterbaratieri.services.exceptions.ResourceNotFoundException;
 
-import com.baratieri.automasterbaratieri.services.util.FormatacaoUtil;
+import com.baratieri.automasterbaratieri.util.FormatacaoUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;

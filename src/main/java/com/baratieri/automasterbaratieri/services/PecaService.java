@@ -7,7 +7,7 @@ import com.baratieri.automasterbaratieri.entities.Peca;
 import com.baratieri.automasterbaratieri.repositories.PecaRepository;
 import com.baratieri.automasterbaratieri.services.exceptions.RegraNegocioException;
 import com.baratieri.automasterbaratieri.services.exceptions.ResourceNotFoundException;
-import com.baratieri.automasterbaratieri.services.util.FormatacaoUtil;
+import com.baratieri.automasterbaratieri.util.FormatacaoUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

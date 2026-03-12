@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-import static com.baratieri.automasterbaratieri.services.util.FormatacaoUtil.formatarTextoOpcional;
-import static com.baratieri.automasterbaratieri.services.util.ValidacaoDominio.validarDadosObrigatorio;
-import static com.baratieri.automasterbaratieri.services.util.ValidacaoDominio.validarValorPositivo;
+import static com.baratieri.automasterbaratieri.util.FormatacaoUtil.formatarTextoOpcional;
+import static com.baratieri.automasterbaratieri.util.ValidacaoDominio.validarDadosObrigatorio;
+import static com.baratieri.automasterbaratieri.util.ValidacaoDominio.validarValorMaiorQueZero;
 
 @Entity
 @Data
@@ -49,7 +49,7 @@ public class Mecanico extends Inativavel {
     }
 
     public void atualizarDados(BigDecimal taxaComissao){
-        validarValorPositivo(taxaComissao, "A taxa de comissão não pode ser nula. Ou negativa.");
+        validarValorMaiorQueZero(taxaComissao, "A taxa de comissão não pode ser nula. Ou negativa.");
         this.taxaComissao = taxaComissao;
     }
 

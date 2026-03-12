@@ -1,6 +1,5 @@
 package com.baratieri.automasterbaratieri.entities;
 
-import com.baratieri.automasterbaratieri.dto.request.ItemPecaRequestDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;

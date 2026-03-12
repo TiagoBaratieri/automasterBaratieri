@@ -1,7 +1,7 @@
 package com.baratieri.automasterbaratieri.entities;
 
 import com.baratieri.automasterbaratieri.services.exceptions.RegraNegocioException;
-import com.baratieri.automasterbaratieri.services.util.FormatacaoUtil;
+import com.baratieri.automasterbaratieri.util.FormatacaoUtil;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-import static com.baratieri.automasterbaratieri.services.util.ValidacaoDominio.*;
+import static com.baratieri.automasterbaratieri.util.ValidacaoDominio.*;
 
 @Entity
 @Data
@@ -54,7 +54,7 @@ public class Peca extends Inativavel{
         validarDadosObrigatorio(nome, "O nome é obrigatório");
         validarDadosObrigatorio(marca, "A marca é obrigatória.");
 
-        validarEstoqueNaoNegativo(quantidadeEstoque, "A quantidade em estoque não pode ser negativa.");
+        validarInteiroMaiorQueZero(quantidadeEstoque, "A quantidade em estoque não pode ser negativa.");
 
         this.sku = FormatacaoUtil.formatarTextoOpcional(sku);
         this.nome = FormatacaoUtil.formatarTextoOpcional(nome);
@@ -68,9 +68,9 @@ public class Peca extends Inativavel{
     }
 
     public void atualizarPeca(BigDecimal precoVenda, BigDecimal precoCusto,Integer estoqueMinimo) {
-        validarValorPositivo(precoVenda, "O preço de venda deve ser maior que zero.");
+        validarValorMaiorQueZero(precoVenda, "O preço de venda deve ser maior que zero.");
         validarValorNegativo(precoCusto, "O preço de custo não pode ser negativo.");
-        validarEstoqueNaoNegativo(estoqueMinimo, "O estoque mínimo não pode ser negativo.");
+        validarInteiroMaiorQueZero(estoqueMinimo, "O estoque mínimo não pode ser negativo.");
 
         this.precoVenda = precoVenda;
         this.precoCusto = precoCusto;
@@ -78,7 +78,7 @@ public class Peca extends Inativavel{
     }
 
     public void adicionarEstoque(Integer quantidade) {
-        validarEstoqueNaoNegativo(quantidade,"Quantidade deve ser positiva.");
+        validarInteiroMaiorQueZero(quantidade,"Quantidade deve ser positiva.");
         this.quantidadeEstoque += quantidade;
     }
 
@@ -92,7 +92,7 @@ public class Peca extends Inativavel{
     }
 
     private void verificarQuantidadeEstoque(Integer quantidade) {
-        validarEstoqueNaoNegativo(quantidade,"Quantidade deve ser positiva.");
+        validarInteiroMaiorQueZero(quantidade,"Quantidade deve ser positiva.");
         if (quantidadeEstoque < quantidade) {
             throw new RegraNegocioException("Estoque insuficiente! Você tentou baixar " + quantidade
                     + " mas só existem " + quantidadeEstoque + " peças disponíveis.");

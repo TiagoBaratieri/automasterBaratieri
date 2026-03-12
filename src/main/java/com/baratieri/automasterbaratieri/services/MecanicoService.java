@@ -6,7 +6,7 @@ import com.baratieri.automasterbaratieri.dto.response.MecanicoResponseDTO;
 import com.baratieri.automasterbaratieri.entities.Mecanico;
 import com.baratieri.automasterbaratieri.repositories.MecanicoRepository;
 import com.baratieri.automasterbaratieri.services.exceptions.ResourceNotFoundException;
-import com.baratieri.automasterbaratieri.services.util.FormatacaoUtil;
+import com.baratieri.automasterbaratieri.util.FormatacaoUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

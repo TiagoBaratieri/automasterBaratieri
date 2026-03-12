@@ -17,7 +17,9 @@ public enum StatusOS {
     FINALIZADO,
 
     // 5. Cliente não aceitou o orçamento
-    CANCELADO;
+    CANCELADO,
+
+    PAGO;
 
     public static List<StatusOS> getAtivos() {
         return List.of(APROVADO,AGUARDANDO_APROVACAO, EM_EXECUCAO);

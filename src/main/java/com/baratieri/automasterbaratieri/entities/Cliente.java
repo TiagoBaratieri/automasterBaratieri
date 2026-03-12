@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.baratieri.automasterbaratieri.services.util.FormatacaoUtil.formatarEmail;
-import static com.baratieri.automasterbaratieri.services.util.FormatacaoUtil.formatarTextoOpcional;
-import static com.baratieri.automasterbaratieri.services.util.ValidacaoDominio.validarDadosObrigatorio;
+import static com.baratieri.automasterbaratieri.util.FormatacaoUtil.formatarEmail;
+import static com.baratieri.automasterbaratieri.util.FormatacaoUtil.formatarTextoOpcional;
+import static com.baratieri.automasterbaratieri.util.ValidacaoDominio.validarDadosObrigatorio;
 
 
 @Entity
