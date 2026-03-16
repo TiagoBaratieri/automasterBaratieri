@@ -32,13 +32,21 @@ public abstract class Pagamento {
     public Pagamento(BigDecimal valor, OrdemServico ordemServico) {
         this.valor = valor;
         this.ordemServico = ordemServico;
+        this.statusPagamento = StatusPagamento.PENDENTE;
     }
 
     public void confirmarPagamento() {
+        validarStatusPagamento();
         if (statusPagamento == StatusPagamento.PAGO) {
             throw new RuntimeException("Este pagamento já foi processado anteriormente.");
         }
         statusPagamento = StatusPagamento.PAGO;
         dataPagamento = LocalDateTime.now();
+    }
+
+    public void validarStatusPagamento() {
+        if (statusPagamento == null) {
+            throw new RuntimeException("O status do pagamento não pode ser nulo.");
+        }
     }
 }

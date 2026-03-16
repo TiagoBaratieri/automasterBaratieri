@@ -22,7 +22,7 @@ public class PagamentoService {
 
         os.validarPagamentoApenasOrdemServicoFinalizada();
         Pagamento pagamento = fabricarPagamento(dto, os);
-        os.adicionarPagamentoOrdemServico(pagamento);
+        os.adicionarPagamento(pagamento);
         pagamento.confirmarPagamento();
         pagamentoRepository.save(pagamento);
 

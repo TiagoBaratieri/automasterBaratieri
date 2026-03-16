@@ -6,7 +6,7 @@ import com.baratieri.automasterbaratieri.services.RelatorioService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.ByteArrayResource;
@@ -51,7 +51,7 @@ public class EmailOrcamentoListener {
         }
     }
 
-    private @NonNull MimeMessageHelper getMimeMessageHelper(MimeMessage message, OrdemServico os, String motivo) throws MessagingException {
+    private MimeMessageHelper getMimeMessageHelper(MimeMessage message, OrdemServico os, String motivo) throws MessagingException {
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
         helper.setFrom(emailRemetente);

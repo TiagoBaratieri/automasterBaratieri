@@ -132,7 +132,7 @@ public class OrdemServico {
         this.valorTotal = totalPecas.add(totalServicos);
     }
 
-    public void adicionarPagamentoOrdemServico(Pagamento pagamento ) {
+    public void adicionarPagamento(Pagamento pagamento ) {
         BigDecimal totalJaPago = pagamentos.stream()
                 .map(Pagamento::getValor)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -275,4 +275,3 @@ public class OrdemServico {
         this.calcularTotal();
     }
 }
-
