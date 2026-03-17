@@ -78,4 +78,5 @@ class OrdemServicoTest {
         assertEquals(1, ordemServico.getPagamentos().size());
         assertEquals(new BigDecimal("100.00"), ordemServico.getPagamentos().get(0).getValor());
     }
+
 }

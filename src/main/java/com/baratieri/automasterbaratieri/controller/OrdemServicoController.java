@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,11 @@ public class OrdemServicoController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
 
-        headers.setContentDispositionFormData("inline", "Ordem_Servico_" + id + ".pdf");
+        ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
+                .filename("Ordem_Servico_" + id + ".pdf")
+                .build();
+
+        headers.setContentDisposition(contentDisposition);
 
         return ResponseEntity.ok()
                 .headers(headers)
