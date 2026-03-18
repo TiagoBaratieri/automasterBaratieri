@@ -57,7 +57,7 @@ class OrdemServicoControllerTest {
 
     @Test
     void deveRetornarCreatedEHeaderLocationAoAbrirOs() throws Exception {
-        // Arrange
+
         AberturaOsRequestDTO requestDTO = new AberturaOsRequestDTO("ABC-1234", "Observação inicial");
         OrdemServicoResponseDTO responseDTO = new OrdemServicoResponseDTO(
                 1L, "OS-1", LocalDateTime.now(), null, null, null, null, null, Collections.emptyList(), Collections.emptyList(), BigDecimal.ZERO

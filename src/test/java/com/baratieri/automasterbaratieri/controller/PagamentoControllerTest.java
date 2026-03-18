@@ -18,6 +18,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PagamentoController.class)
@@ -32,40 +33,48 @@ class PagamentoControllerTest {
     @Test
     @DisplayName("Deve retornar 201 Created quando registrar pagamento com sucesso")
     void deveRetornarCreatedQuandoRegistrarPagamento() throws Exception {
-        // Arrange
+
         when(pagamentoService.registrarPagamento(anyLong(), any()))
                 .thenReturn(new PagamentoResponseDTO(1L, new BigDecimal("150.00"), StatusPagamento.PAGO, LocalDateTime.now()));
 
-        String jsonPayload = """
+        String jsonPayload =jsonPayloadPagamentotoComSucesso();
+
+        mockMvc.perform(post("/ordens-servico/1/pagamento")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonPayload))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.valor").value(150.00)) // Garante que o valor retornou certo
+                .andExpect(jsonPath("$.status").value("PAGO")); // Garante que o status mudou
+    }
+
+    @Test
+    @DisplayName("Deve retornar 422 Unprocessable Entity quando tipoPagamento estiver em branco")
+    void deveRetornarUnprocessableEntityQuandoTipoPagamentoEmBranco() throws Exception {
+
+        String jsonPayload = jsonPayloadTipoPagamentoEmBranco();
+
+        mockMvc.perform(post("/ordens-servico/1/pagamento")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonPayload))
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    private String jsonPayloadPagamentotoComSucesso() {
+        return """
             {
                 "tipoPagamento": "PIX",
                 "valor": 150.00,
                 "chavePix": "123456789"
             }
             """;
-
-        // Act & Assert
-        mockMvc.perform(post("/ordens-servico/1/pagamento")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonPayload))
-                .andExpect(status().isCreated());
     }
 
-    @Test
-    @DisplayName("Deve retornar 422 Unprocessable Entity quando tipoPagamento estiver em branco")
-    void deveRetornarUnprocessableEntityQuandoTipoPagamentoEmBranco() throws Exception {
-        // Arrange
-        String jsonPayload = """
+    private String jsonPayloadTipoPagamentoEmBranco () {
+        return """
             {
                 "tipoPagamento": "",
                 "valor": 150.00
             }
             """;
-
-        // Act & Assert
-        mockMvc.perform(post("/ordens-servico/1/pagamento")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonPayload))
-                .andExpect(status().isUnprocessableEntity());
     }
 }

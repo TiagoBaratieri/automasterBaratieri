@@ -14,18 +14,21 @@ import static org.junit.jupiter.api.Assertions.*;
 class OrdemServicoTest {
 
     private OrdemServico ordemServico;
+    private final BigDecimal valorTotalOs = new BigDecimal("200.00");
 
     @BeforeEach
     void setUp() {
+
         Veiculo veiculo = new Veiculo();
         ordemServico = new OrdemServico(veiculo, "Troca de óleo");
-        ordemServico.setValorTotal(new BigDecimal("200.00"));
+        ordemServico.setValorTotal(valorTotalOs);
     }
 
     @Test
     @DisplayName("Deve adicionar pagamento parcial com sucesso")
     void deveAdicionarPagamentoParcialComSucesso() {
-        Pagamento pagamento = new PagamentoCartao(ordemServico, new BigDecimal("100.00"), 1, "Visa");
+
+        Pagamento pagamento = fabricaPagamentoComCartao(new BigDecimal("100.00"));
         ordemServico.adicionarPagamento(pagamento);
 
         assertEquals(1, ordemServico.getPagamentos().size());
@@ -35,7 +38,7 @@ class OrdemServicoTest {
     @Test
     @DisplayName("Deve zerar o saldo e mudar status para PAGO")
     void deveZerarSaldoEMudarStatusParaPago() {
-        Pagamento pagamento = new PagamentoCartao(ordemServico, new BigDecimal("200.00"), 1, "Visa");
+        Pagamento pagamento = fabricaPagamentoComCartao(valorTotalOs);
         ordemServico.adicionarPagamento(pagamento);
 
         assertEquals(1, ordemServico.getPagamentos().size());
@@ -45,7 +48,8 @@ class OrdemServicoTest {
     @Test
     @DisplayName("Deve lançar exceção ao tentar pagar valor maior que saldo devedor no cartão")
     void deveLancarExcecaoAoTentarPagarValorMaiorQueSaldoDevedorNoCartao() {
-        Pagamento pagamento = new PagamentoCartao(ordemServico, new BigDecimal("300.00"), 1, "Visa");
+
+        Pagamento pagamento = fabricaPagamentoComCartao(new BigDecimal("300.00"));
 
         RegraNegocioException exception = assertThrows(RegraNegocioException.class, () -> {
             ordemServico.adicionarPagamento(pagamento);
@@ -57,10 +61,10 @@ class OrdemServicoTest {
     @Test
     @DisplayName("Deve lançar exceção ao tentar adicionar pagamento em O.S. já paga")
     void deveLancarExcecaoAoTentarAdicionarPagamentoEmOSJaPaga() {
-        Pagamento pagamentoInicial = new PagamentoCartao(ordemServico, new BigDecimal("200.00"), 1, "Visa");
+        Pagamento pagamentoInicial = fabricaPagamentoComCartao(valorTotalOs);
         ordemServico.adicionarPagamento(pagamentoInicial);
 
-        Pagamento novoPagamento = new PagamentoCartao(ordemServico, new BigDecimal("50.00"), 1, "Mastercard");
+        Pagamento novoPagamento = fabricaPagamentoComCartao(new BigDecimal("50.00"));
 
         RegraNegocioException exception = assertThrows(RegraNegocioException.class, () -> {
             ordemServico.adicionarPagamento(novoPagamento);
@@ -79,4 +83,7 @@ class OrdemServicoTest {
         assertEquals(new BigDecimal("100.00"), ordemServico.getPagamentos().get(0).getValor());
     }
 
+    private Pagamento fabricaPagamentoComCartao(BigDecimal valor) {
+        return new PagamentoCartao(ordemServico, valor, 1, "Visa");
+    }
 }
