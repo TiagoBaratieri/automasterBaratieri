@@ -83,7 +83,104 @@ class OrdemServicoTest {
         assertEquals(new BigDecimal("100.00"), ordemServico.getPagamentos().get(0).getValor());
     }
 
+    @Test
+    @DisplayName("Deve calcular o valor total somando os subtotais de peças e serviços.")
+    void deveCalcularvalorTotalComSucesso() {
+        Peca peca = new Peca();
+        Servico servico = new Servico();
+        // 2 Pneus de R$ 300,00 cada = Subtotal de R$ 600,00
+        ItemPeca itemPeca = new ItemPeca(ordemServico, peca, 2, new BigDecimal("300.00"));
+        // 1 Alinhamento 3D = Subtotal de R$ 100,00
+        ItemServico itemServico = new ItemServico(ordemServico, servico, null,
+                new BigDecimal("100.00"), 1, "Alinhamento 3D");
+
+        ordemServico.adicionarServico(itemServico);
+        ordemServico.adicionarPecaOrdemServico(itemPeca);
+
+        // O valor original do setUp (200.00) é substituído pelo novo cálculo.
+        // 600 (Peças) + 100 (Serviços) = 700.00
+        assertEquals(new BigDecimal("700.00"), ordemServico.getValorTotal());
+    }
+
+    @Test
+    @DisplayName("Deve recalcular e subtrair do valor total quando uma peça for removida")
+    void deveSubtrairValorTotalAoSubtrairPeca() {
+
+        Peca peca = new Peca();
+        peca.setQuantidadeEstoque(10);
+
+        ItemPeca filtroAr = new ItemPeca(ordemServico, peca, 1, new BigDecimal("50.00"));
+        filtroAr.setId(1L);
+
+        ItemPeca oleo = new ItemPeca(ordemServico, peca, 1, new BigDecimal("150.00"));
+        oleo.setId(2L);
+
+        ordemServico.adicionarPecaOrdemServico(filtroAr);
+        ordemServico.adicionarPecaOrdemServico(oleo);
+
+        ordemServico.removerPecaOrdemServico(oleo);
+
+        assertEquals(new BigDecimal("50.00"), ordemServico.getValorTotal());
+    }
+
+    @Test
+    @DisplayName("Deve aprovar orçamento e mudar status para EM_EXECUCAO")
+    void deveAprovarOrcamentoComSucesso() {
+        ordemServico.aprovarOrcamento();
+
+        assertEquals(StatusOS.EM_EXECUCAO, ordemServico.getStatus());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao tentar aprovar uma O.S. cancelada")
+    void deveLancarExcecaoAoAprovarOsCancelada() {
+        ordemServico.cancelarOs();
+        assertEquals(StatusOS.CANCELADO, ordemServico.getStatus());
+
+        RegraNegocioException exception = assertThrows(RegraNegocioException.class, () -> {
+            ordemServico.aprovarOrcamento();
+        });
+
+        assertEquals("Não é possível aprovar um orçamento de uma" +
+                " Ordem de Serviço que foi cancelada.", exception.getMessage());
+    }
+
+
+    @Test
+    @DisplayName("Deve lançar exceção ao validar aprovação de O.S. sem peças e sem serviços")
+    void deveLancarExcecaoAoValidarAprovacaoSemItens() {
+
+        RegraNegocioException exception = assertThrows(RegraNegocioException.class, () -> {
+            ordemServico.validarPecasOrdemServicoAprovada();
+        });
+
+        assertEquals("Não é possível aprovar a Ordem de Serviço. Adicione pelo menos uma Peça ou Serviço ao orçamento.", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Deve cancelar a O.S. com sucesso e registrar a data de fechamento")
+    void deveCancelarOsComSucesso() {
+        ordemServico.cancelarOs();
+
+        assertEquals(StatusOS.CANCELADO, ordemServico.getStatus());
+        assertNotNull(ordemServico.getDataFechamento());
+    }
+
+    @Test
+    @DisplayName("Deve lançar exceção ao tentar cancelar uma O.S. finalizada")
+    void deveLancarExcecaoAoCancelarOsFinalizada() {
+        ordemServico.aprovarOrcamento();
+        ordemServico.finalizarOs();
+
+        RegraNegocioException exception = assertThrows(RegraNegocioException.class, () -> {
+            ordemServico.cancelarOs();
+        });
+
+        assertEquals("Não é possível cancelar uma Ordem de Serviço que já foi finalizada e entregue ao cliente.", exception.getMessage());
+    }
+    
     private Pagamento fabricaPagamentoComCartao(BigDecimal valor) {
         return new PagamentoCartao(ordemServico, valor, 1, "Visa");
     }
+
 }
