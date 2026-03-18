@@ -1,5 +1,6 @@
 package com.baratieri.automasterbaratieri.services;
 
+
 import com.baratieri.automasterbaratieri.entities.OrdemServico;
 import com.baratieri.automasterbaratieri.services.exceptions.RegraNegocioException;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
@@ -26,9 +27,10 @@ public class RelatorioService {
         Context context = new Context();
         context.setVariable("os", os);
 
-        String html = templateEngine.process("ordem-servico", context);
-
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            String html = templateEngine.process("ordem-servico", context);
+
             PdfRendererBuilder builder = new PdfRendererBuilder();
             builder.useFastMode();
             builder.withHtmlContent(html, null);
@@ -37,6 +39,7 @@ public class RelatorioService {
 
             return outputStream.toByteArray();
         } catch (Exception e) {
+
             throw new RegraNegocioException("Erro ao gerar o documento PDF da Ordem de Serviço");
         }
     }

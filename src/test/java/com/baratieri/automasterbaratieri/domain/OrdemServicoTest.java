@@ -178,7 +178,7 @@ class OrdemServicoTest {
 
         assertEquals("Não é possível cancelar uma Ordem de Serviço que já foi finalizada e entregue ao cliente.", exception.getMessage());
     }
-    
+
     private Pagamento fabricaPagamentoComCartao(BigDecimal valor) {
         return new PagamentoCartao(ordemServico, valor, 1, "Visa");
     }
