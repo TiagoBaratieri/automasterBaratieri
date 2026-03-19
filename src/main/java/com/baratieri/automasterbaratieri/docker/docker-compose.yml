@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  # 1. O Banco de Dados PostgreSQL
+  postgres-automaster:
+    image: postgres:15-alpine
+    container_name: db_automaster
+    restart: always
+    environment:
+      POSTGRES_DB: automaster_db
+      POSTGRES_USER: automaster_admin
+      POSTGRES_PASSWORD: admin_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - automaster_pgdata:/var/lib/postgresql/data # Garante que os dados não se perdem se o Docker desligar
+
+
+volumes:
+  automaster_pgdata:
