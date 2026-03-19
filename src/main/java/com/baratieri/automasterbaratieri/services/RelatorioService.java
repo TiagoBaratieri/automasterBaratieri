@@ -1,47 +1,33 @@
 package com.baratieri.automasterbaratieri.services;
 
-
 import com.baratieri.automasterbaratieri.entities.OrdemServico;
-import com.baratieri.automasterbaratieri.services.exceptions.RegraNegocioException;
-import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import com.baratieri.automasterbaratieri.services.interfaces.GeradorPdfService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 
-import java.io.ByteArrayOutputStream;
+import java.math.BigDecimal;
 
 @Service
+@RequiredArgsConstructor
 public class RelatorioService {
 
-    private final TemplateEngine templateEngine;
     private final OrdemServicoService ordemServicoService;
-
-    public RelatorioService(TemplateEngine templateEngine, OrdemServicoService ordemServicoService) {
-        this.templateEngine = templateEngine;
-        this.ordemServicoService = ordemServicoService;
-    }
+    private final GeradorPdfService geradorPdf;
 
     public byte[] gerarPdfOrdemServico(Long id) {
         OrdemServico os = ordemServicoService.ordemServicoExiste(id);
 
-        Context context = new Context();
-        context.setVariable("os", os);
+        return geradorPdf.gerarPdfOrdemServico(os);
+    }
 
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+    public byte[] gerarReciboPagamento(Long osId) {
 
-            String html = templateEngine.process("ordem-servico", context);
+        OrdemServico os = ordemServicoService.ordemServicoExiste(osId);
 
-            PdfRendererBuilder builder = new PdfRendererBuilder();
-            builder.useFastMode();
-            builder.withHtmlContent(html, null);
-            builder.toStream(outputStream);
-            builder.run();
+        os.validarGeracaoRecibo();
 
-            return outputStream.toByteArray();
-        } catch (Exception e) {
+        BigDecimal totalPago = os.calcularTotalPago();
 
-            throw new RegraNegocioException("Erro ao gerar o documento PDF da Ordem de Serviço");
-        }
+        return geradorPdf.gerarReciboPagamento(os, totalPago);
     }
 }
-

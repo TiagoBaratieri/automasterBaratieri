@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Recibo de Pagamento</title>
+    <style>
+        body { font-family: Helvetica, Arial, sans-serif; margin: 40px; }
+        .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; }
+        .pagamentos { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .pagamentos th, .pagamentos td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>AUTOMASTER - RECIBO DE PAGAMENTO</h1>
+    <h3 th:text="'Ordem de Serviço Nº: ' + ${os.id}">Ordem de Serviço Nº: 0</h3>
+</div>
+
+<p><strong>Cliente:</strong> <span th:text="${os.veiculo.cliente.nome}">Nome</span></p>
+<p><strong>Veículo:</strong> <span th:text="${os.veiculo.placa}">Placa</span></p>
+
+<h3>Histórico de Pagamentos</h3>
+<table class="pagamentos">
+    <thead>
+    <tr>
+        <th>Data</th>
+        <th>Valor Pago</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="pag : ${os.pagamentos}">
+        <td th:text="${#temporals.format(pag.dataPagamento, 'dd/MM/yyyy HH:mm')}">Data</td>
+        <td th:text="'R$ ' + ${pag.valor}">R$ 0,00</td>
+    </tr>
+    </tbody>
+</table>
+
+<h2 style="text-align: right; margin-top: 20px;" th:text="'Total Pago: R$ ' + ${totalPago}">Total Pago: R$ 0,00</h2>
+</body>
+</html>

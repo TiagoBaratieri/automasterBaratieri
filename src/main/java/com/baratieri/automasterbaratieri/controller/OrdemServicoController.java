@@ -50,6 +50,21 @@ public class OrdemServicoController {
                 .body(relatorioPdf);
     }
 
+
+    @GetMapping("/{id}/recibo-pagamento")
+    public ResponseEntity<byte[]> baixarReciboPagamento(@PathVariable Long id) {
+
+        byte[] pdf = relatorioService.gerarReciboPagamento(id);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "Recibo_Pagamento_OS_" + id + ".pdf");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdf);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<OrdemServicoResponseDTO> buscarOrdemServicoPorId(@PathVariable Long id) {
         return ResponseEntity.ok(ordemServicoService.buscarOrdemServicoPorId(id));

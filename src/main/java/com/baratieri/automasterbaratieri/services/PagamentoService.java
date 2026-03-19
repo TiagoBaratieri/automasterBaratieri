@@ -3,9 +3,11 @@ package com.baratieri.automasterbaratieri.services;
 import com.baratieri.automasterbaratieri.dto.request.PagamentoRequestDTO;
 import com.baratieri.automasterbaratieri.dto.response.PagamentoResponseDTO;
 import com.baratieri.automasterbaratieri.entities.*;
+import com.baratieri.automasterbaratieri.eventos.PagamentoRegistradoEvento;
 import com.baratieri.automasterbaratieri.repositories.PagamentoRepository;
 import com.baratieri.automasterbaratieri.services.exceptions.RegraNegocioException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +17,7 @@ public class PagamentoService {
 
     private final PagamentoRepository pagamentoRepository;
     private final OrdemServicoService ordemServicoService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public PagamentoResponseDTO registrarPagamento(Long osId, PagamentoRequestDTO dto) {
@@ -24,6 +27,7 @@ public class PagamentoService {
         Pagamento pagamento = fabricarPagamento(dto, os);
         os.adicionarPagamento(pagamento);
         pagamento.confirmarPagamento();
+        eventPublisher.publishEvent(new PagamentoRegistradoEvento(this, os.getId()));
         pagamentoRepository.save(pagamento);
 
         return PagamentoResponseDTO.fromEntity(pagamento);

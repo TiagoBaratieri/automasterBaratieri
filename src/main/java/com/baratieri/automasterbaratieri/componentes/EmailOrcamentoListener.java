@@ -57,9 +57,17 @@ public class EmailOrcamentoListener {
         helper.setFrom(emailRemetente);
         helper.setTo(os.getVeiculo().getCliente().getEmail());
 
-        String assunto = (motivo != null && !motivo.isBlank())
-                ? "⚠️ Orçamento ATUALIZADO para Avaliação - AutoMaster - OS Nº " + os.getId()
-                : "Orçamento para Avaliação - AutoMaster - OS Nº " + os.getId();
+        String assunto = assuntoOrcamento(os, motivo);
+
+        String textoBase = textoBaseOrcamento(os,  motivo);
+        helper.setSubject(assunto);
+        helper.setText(textoBase);
+
+        return helper;
+    }
+
+
+    private String textoBaseOrcamento(OrdemServico os, String motivo) {
 
         String textoBase = "Olá, " + os.getVeiculo().getCliente().getNome() + "!\n\n";
 
@@ -72,10 +80,12 @@ public class EmailOrcamentoListener {
 
         textoBase += "Confira o PDF em anexo com a lista de peças, serviços e o valor total.\n" +
                 "Por favor, responda a este e-mail aprovando para darmos continuidade aos trabalhos.";
+        return textoBase;
+    }
 
-        helper.setSubject(assunto);
-        helper.setText(textoBase);
-
-        return helper;
+    private String assuntoOrcamento(OrdemServico os, String motivo) {
+        return (motivo != null && !motivo.isBlank())
+                ? "⚠️ Orçamento ATUALIZADO para Avaliação - AutoMaster - OS Nº " + os.getId()
+                : "Orçamento para Avaliação - AutoMaster - OS Nº " + os.getId();
     }
 }

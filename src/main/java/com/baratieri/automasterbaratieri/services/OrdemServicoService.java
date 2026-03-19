@@ -139,7 +139,7 @@ public class OrdemServicoService {
         os.aprovarOrcamento();
         os.validarPecasOrdemServicoAprovada();
         os = ordemServicoRepository.save(os);
-        eventPublisher.publishEvent(new OrdemServicoAprovadaEvento(os));
+        eventPublisher.publishEvent(new OrdemServicoAprovadaEvento(this,os));
         return OrdemServicoResponseDTO.fromEntity(os);
     }
 
@@ -150,7 +150,7 @@ public class OrdemServicoService {
         os.validarReenvioOrcamento(motivo);
         os.aguardarOs();
         ordemServicoRepository.save(os);
-        eventPublisher.publishEvent(new OrcamentoProntoEvento(os, motivo));
+        eventPublisher.publishEvent(new OrcamentoProntoEvento(this,os, motivo));
     }
 
     @Transactional

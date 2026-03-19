@@ -232,6 +232,21 @@ public class OrdemServico {
         }
     }
 
+    public void validarGeracaoRecibo() {
+        if (pagamentos == null || this.pagamentos.isEmpty()) {
+            throw new RegraNegocioException("Não é possível gerar um recibo. " +
+                    "Não existem pagamentos registados para esta Ordem de Serviço.");
+        }
+    }
+
+    public BigDecimal calcularTotalPago() {
+        if (pagamentos == null) return BigDecimal.ZERO;
+
+        return pagamentos.stream()
+                .map(Pagamento::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
 
     private void validarStatusOrdemServicoFinalizadaOuCancelada() {
         if (status == StatusOS.FINALIZADO || status == StatusOS.CANCELADO) {
