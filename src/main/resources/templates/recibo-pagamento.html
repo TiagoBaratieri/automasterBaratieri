@@ -23,14 +23,18 @@
 <table class="pagamentos">
     <thead>
     <tr>
+        <th>Tipo pagamentoto</th>
+        <th>Detalhes</th>
         <th>Data</th>
         <th>Valor Pago</th>
     </tr>
     </thead>
     <tbody>
-    <tr th:each="pag : ${os.pagamentos}">
-        <td th:text="${#temporals.format(pag.dataPagamento, 'dd/MM/yyyy HH:mm')}">Data</td>
-        <td th:text="'R$ ' + ${pag.valor}">R$ 0,00</td>
+    <tr th:each="p : ${pagamentosDTO}">
+        <td th:text="${p.tipoPagamento}"></td>
+        <td th:text="${p.detalhes}"></td>
+        <td th:text="${#temporals.format(p.dataPagamento, 'dd/MM/yyyy HH:mm')}"></td>
+        <td th:text="${#numbers.formatCurrency(p.valor)}"></td>
     </tr>
     </tbody>
 </table>

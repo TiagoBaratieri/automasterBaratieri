@@ -66,15 +66,15 @@ public class OrdemServico {
     }
 
     public void adicionarPecaOrdemServico(ItemPeca item) {
-        validarStatusOrdemServicoFinalizadaOuCancelada();
-        ordemServicoAguardandoAprovacaoOuExecucao();
+        validarAlteracaoDeItens();
+        gerenciarStatusAoAlterarItens();
         itensPeca.add(item);
         calcularTotal();
     }
 
     public void adicionarServico(ItemServico item) {
-        validarStatusOrdemServicoFinalizadaOuCancelada();
-        ordemServicoAguardandoAprovacaoOuExecucao();
+        validarAlteracaoDeItens();
+        gerenciarStatusAoAlterarItens();
         itensServico.add(item);
         calcularTotal();
     }
@@ -83,8 +83,8 @@ public class OrdemServico {
         if (item == null) {
             throw new RegraNegocioException("O item de peça não pode ser nulo.");
         }
-        validarStatusOrdemServicoFinalizadaOuCancelada();
-        ordemServicoAguardandoAprovacaoOuExecucao();
+        validarAlteracaoDeItens();
+        gerenciarStatusAoAlterarItens();
         if (!itensPeca.contains(item)) {
             throw new RegraNegocioException("Este item de peça não pertence a esta Ordem de Serviço.");
         }
@@ -98,8 +98,8 @@ public class OrdemServico {
         if (item == null) {
             throw new RegraNegocioException("O item de serviço não pode ser nulo.");
         }
-        validarStatusOrdemServicoFinalizadaOuCancelada();
-        ordemServicoAguardandoAprovacaoOuExecucao();
+        validarAlteracaoDeItens();
+        gerenciarStatusAoAlterarItens();
 
         if (!itensServico.contains(item)) {
             throw new RegraNegocioException("Este item de serviço não pertence a esta Ordem de Serviço.");
@@ -114,12 +114,11 @@ public class OrdemServico {
 
         if (itensPeca != null && !itensPeca.isEmpty()) {
             totalPecas = itensPeca.stream()
-                    .map(ItemPeca::getSubtotal) // Chama o getSubtotal() de cada item
-                    .filter(Objects::nonNull)  // Segurança contra nulos
-                    .reduce(BigDecimal.ZERO, BigDecimal::add); // Soma acumulada
+                    .map(ItemPeca::getSubtotal)
+                    .filter(Objects::nonNull)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
         }
 
-        //Soma o total dos SERVIÇOS
         BigDecimal totalServicos = BigDecimal.ZERO;
 
         if (itensServico != null && !itensServico.isEmpty()) {
@@ -148,6 +147,7 @@ public class OrdemServico {
     }
 
     public void atualizarDescricaoServico(String descricao) {
+        validarAlteracaoDeItens();
         if (descricao == null || descricao.trim().isEmpty()) {
             throw new RegraNegocioException("A descrição do serviço é obrigatória.");
         }
@@ -167,22 +167,11 @@ public class OrdemServico {
     }
 
     public void aprovarOrcamento() {
-        if (this.status == StatusOS.FINALIZADO) {
-            throw new RegraNegocioException("Esta Ordem de Serviço já foi finalizada e entregue. Não é possível aprová-la novamente.");
-        }
-
-        if (status == StatusOS.CANCELADO) {
-            throw new RegraNegocioException("Não é possível aprovar um orçamento de uma Ordem de Serviço que foi cancelada.");
-        }
-
-        if (status == StatusOS.EM_EXECUCAO) {
-            throw new RegraNegocioException("Este orçamento já foi aprovado anteriormente e o serviço encontra-se em execução.");
-        }
-
         if (status != StatusOS.AGUARDANDO_APROVACAO) {
-            throw new RegraNegocioException("Apenas orçamentos com status AGUARDANDO_APROVACAO podem ser aprovados.");
+            throw new RegraNegocioException("Apenas orçamentos com status 'AGUARDANDO_APROVACAO' podem ser aprovados.");
         }
         status = StatusOS.EM_EXECUCAO;
+        orcamentoAlterado = false;
     }
 
     public void finalizarOs() {
@@ -247,16 +236,20 @@ public class OrdemServico {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-
-    private void validarStatusOrdemServicoFinalizadaOuCancelada() {
+    private void validarAlteracaoDeItens() {
         if (status == StatusOS.FINALIZADO || status == StatusOS.CANCELADO || status == StatusOS.PAGO) {
-            throw new RegraNegocioException("Não é possível adicionar peças em uma OS encerrada ou cancelada.");
+            throw new RegraNegocioException("Não é possível alterar uma OS que já foi finalizada, cancelada ou paga.");
+        }
+        if (status == StatusOS.AGUARDANDO_APROVACAO && orcamentoAlterado) {
+            throw new RegraNegocioException(
+                    "Não é possível alterar esta O.S. Um orçamento modificado já foi enviado ao cliente " +
+                    "e está aguardando sua aprovação. Aguarde a resposta para continuar.");
         }
     }
 
     private void validarCancelamento() {
-        if (this.status == StatusOS.FINALIZADO) {
-            throw new RegraNegocioException("Não é possível cancelar uma Ordem de Serviço que já foi finalizada e entregue ao cliente.");
+        if (this.status == StatusOS.FINALIZADO || this.status == StatusOS.PAGO) {
+            throw new RegraNegocioException("Não é possível cancelar uma Ordem de Serviço que já foi finalizada ou paga.");
         }
 
         if (this.status == StatusOS.CANCELADO) {
@@ -264,9 +257,10 @@ public class OrdemServico {
         }
     }
 
-    private void ordemServicoAguardandoAprovacaoOuExecucao() {
-        if (status == StatusOS.EM_EXECUCAO || (status == StatusOS.AGUARDANDO_APROVACAO && orcamentoRevisado)) {
-            orcamentoAlterado = true;
+    private void gerenciarStatusAoAlterarItens() {
+        if (status == StatusOS.EM_EXECUCAO) {
+            this.orcamentoAlterado = true;
+            this.status = StatusOS.AGUARDANDO_APROVACAO;
         }
     }
 
