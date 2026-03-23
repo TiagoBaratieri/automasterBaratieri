@@ -249,7 +249,7 @@ public class OrdemServico {
 
 
     private void validarStatusOrdemServicoFinalizadaOuCancelada() {
-        if (status == StatusOS.FINALIZADO || status == StatusOS.CANCELADO) {
+        if (status == StatusOS.FINALIZADO || status == StatusOS.CANCELADO || status == StatusOS.PAGO) {
             throw new RegraNegocioException("Não é possível adicionar peças em uma OS encerrada ou cancelada.");
         }
     }

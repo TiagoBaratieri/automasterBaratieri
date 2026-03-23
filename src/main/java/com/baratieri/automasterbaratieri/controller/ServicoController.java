@@ -41,8 +41,6 @@ public class ServicoController {
     public ResponseEntity<ServicoResponseDTO> salvarServico(@RequestBody @Valid
                                                               ServicoRequestDTO dto,
                                                               UriComponentsBuilder uriBuilder) {
-
-        System.out.println("DTO RECEBIDO DO POSTMAN: " + dto);
         ServicoResponseDTO servicoDto = service.salvarServico(dto);
 
         URI uri = uriBuilder.path("/{id}")
