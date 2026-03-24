@@ -1,4 +1,5 @@
 package com.baratieri.automasterbaratieri.dto.response;
+
 import com.baratieri.automasterbaratieri.entities.Pagamento;
 import com.baratieri.automasterbaratieri.enums.StatusPagamento;
 
@@ -10,7 +11,11 @@ public record PagamentoResponseDTO(
         Long id,
         BigDecimal valor,
         StatusPagamento status,
-        LocalDateTime dataPagamento
+        LocalDateTime dataPagamento,
+        String tipoPagamento,
+        String detalhes,
+        BigDecimal valorRecebido,
+        BigDecimal troco
 ) {
     public static PagamentoResponseDTO fromEntity(Pagamento pagamento) {
         Objects.requireNonNull(pagamento, "A entidade Pagamento não pode ser nula ao gerar o DTO");
@@ -19,7 +24,11 @@ public record PagamentoResponseDTO(
                 pagamento.getId(),
                 pagamento.getValor(),
                 pagamento.getStatusPagamento(),
-                pagamento.getDataPagamento()
+                pagamento.getDataPagamento(),
+                null, // tipoPagamento
+                null, // detalhes
+                null, // valorRecebido
+                null  // troco
         );
     }
 }

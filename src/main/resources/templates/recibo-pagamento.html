@@ -1,44 +1,204 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
-    <title>Recibo de Pagamento</title>
+    <meta charset="UTF-8"/>
+    <title th:text="'Recibo de Pagamento - OS Nº ' + ${os.id}"></title>
     <style>
-        body { font-family: Helvetica, Arial, sans-serif; margin: 40px; }
-        .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; }
-        .pagamentos { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .pagamentos th, .pagamentos td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #333;
+            background-color: #fff;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .header p {
+            margin: 5px 0 0;
+            color: #666;
+        }
+        .section {
+            margin-bottom: 25px;
+        }
+        .section h2 {
+            font-size: 18px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .info-table td {
+            padding: 8px 0;
+            vertical-align: top;
+            width: 50%;
+        }
+        .info-table strong {
+            display: block;
+            color: #555;
+            margin-bottom: 2px;
+        }
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .payment-table th, .payment-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .payment-table th {
+            background-color: #f7f7f7;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .change-row td {
+            background-color: #f9f9f9;
+            font-style: italic;
+            color: #555;
+        }
+        .totals {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 2px solid #eee;
+            text-align: right;
+        }
+        .totals p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        .totals strong {
+            display: inline-block;
+            width: 150px;
+        }
+        .balance-due {
+            font-weight: bold;
+            color: #d9534f;
+        }
+        .balance-paid {
+            font-weight: bold;
+            color: #5cb85c;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #888;
+        }
     </style>
 </head>
 <body>
-<div class="header">
-    <h1>AUTOMASTER - RECIBO DE PAGAMENTO</h1>
-    <h3 th:text="'Ordem de Serviço Nº: ' + ${os.id}">Ordem de Serviço Nº: 0</h3>
+
+<div class="container">
+
+    <header class="header">
+        <h1>AutoMaster Baratieri</h1>
+        <p>Rua das Oficinas, 123 - Bairro dos Motores - Cidade, UF</p>
+        <p>Telefone: (99) 99999-9999 | Email: contato@automasterbaratieri.com</p>
+    </header>
+
+    <main>
+        <div class="section">
+            <h2 th:text="'Recibo de Pagamento - Ordem de Serviço Nº ' + ${os.id}"></h2>
+            <table class="info-table">
+                <tr>
+                    <td>
+                        <strong>Cliente:</strong>
+                        <span th:text="${os.veiculo.cliente.nome}"></span>
+                    </td>
+                    <td>
+                        <strong>CPF/CNPJ:</strong>
+                        <span th:text="${os.veiculo.cliente.cpfOuCnpj}"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Veículo:</strong>
+                        <span th:text="${os.veiculo.marca} + ' ' + ${os.veiculo.modelo} + ' (' + ${os.veiculo.placa} + ')'"></span>
+                    </td>
+                    <td>
+                        <strong>Data de Abertura da OS:</strong>
+                        <span th:text="${#temporals.format(os.dataAbertura, 'dd/MM/yyyy')}"></span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Detalhes dos Pagamentos</h2>
+            <table class="payment-table">
+                <thead>
+                <tr>
+                    <th>Data do Pagamento</th>
+                    <th>Tipo</th>
+                    <th>Detalhes</th>
+                    <th class="text-right">Valor Pago</th>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:each="p : ${pagamentosDTO}">
+                    <tr>
+                        <td th:text="${#temporals.format(p.dataPagamento, 'dd/MM/yyyy HH:mm')}"></td>
+                        <td th:text="${p.tipoPagamento}"></td>
+                        <td th:text="${p.detalhes}"></td>
+                        <td class="text-right" th:text="${#numbers.formatCurrency(p.valor)}"></td>
+                    </tr>
+                    <!-- Linha do Troco (só aparece se houver troco) -->
+                    <tr class="change-row" th:if="${p.troco != null and p.troco.compareTo(T(java.math.BigDecimal).ZERO) > 0}">
+                        <td colspan="3" class="text-right">
+                            <em>Valor recebido: <span th:text="${#numbers.formatCurrency(p.valorRecebido)}"></span> / Troco:</em>
+                        </td>
+                        <td class="text-right">
+                            <em th:text="${#numbers.formatCurrency(p.troco)}"></em>
+                        </td>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="totals">
+            <p>
+                <strong>Valor Total da OS:</strong>
+                <span th:text="${#numbers.formatCurrency(os.valorTotal)}"></span>
+            </p>
+            <p>
+                <strong>Total Pago:</strong>
+                <span th:text="${#numbers.formatCurrency(totalPago)}"></span>
+            </p>
+            <p th:with="saldoDevedor=${os.valorTotal.subtract(totalPago)}"
+               th:class="${saldoDevedor.compareTo(T(java.math.BigDecimal).ZERO) > 0 ? 'balance-due' : 'balance-paid'}">
+                <strong>Saldo:</strong>
+                <span th:text="${#numbers.formatCurrency(saldoDevedor)}"></span>
+            </p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>Este é um comprovante de pagamento gerado pelo sistema AutoMaster.</p>
+        <p th:text="'Recibo gerado em: ' + ${#temporals.format(T(java.time.LocalDateTime).now(), 'dd/MM/yyyy HH:mm')}"></p>
+    </footer>
+
 </div>
 
-<p><strong>Cliente:</strong> <span th:text="${os.veiculo.cliente.nome}">Nome</span></p>
-<p><strong>Veículo:</strong> <span th:text="${os.veiculo.placa}">Placa</span></p>
-
-<h3>Histórico de Pagamentos</h3>
-<table class="pagamentos">
-    <thead>
-    <tr>
-        <th>Tipo pagamentoto</th>
-        <th>Detalhes</th>
-        <th>Data</th>
-        <th>Valor Pago</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="p : ${pagamentosDTO}">
-        <td th:text="${p.tipoPagamento}"></td>
-        <td th:text="${p.detalhes}"></td>
-        <td th:text="${#temporals.format(p.dataPagamento, 'dd/MM/yyyy HH:mm')}"></td>
-        <td th:text="${#numbers.formatCurrency(p.valor)}"></td>
-    </tr>
-    </tbody>
-</table>
-
-<h2 style="text-align: right; margin-top: 20px;" th:text="'Total Pago: R$ ' + ${totalPago}">Total Pago: R$ 0,00</h2>
 </body>
 </html>

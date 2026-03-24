@@ -5,6 +5,7 @@ import com.baratieri.automasterbaratieri.dto.response.PagamentoResponseDTO;
 import com.baratieri.automasterbaratieri.entities.OrdemServico;
 import com.baratieri.automasterbaratieri.entities.Pagamento;
 import com.baratieri.automasterbaratieri.enums.StatusOS;
+import com.baratieri.automasterbaratieri.eventos.PagamentoRegistradoEvento;
 import com.baratieri.automasterbaratieri.repositories.PagamentoRepository;
 import com.baratieri.automasterbaratieri.services.OrdemServicoService;
 import com.baratieri.automasterbaratieri.services.PagamentoService;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
 
@@ -31,6 +33,9 @@ public class PagamentoServiceTest {
     @Mock
     private OrdemServicoService ordemServicoService;
 
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+
     @InjectMocks
     private PagamentoService pagamentoService;
 
@@ -45,12 +50,14 @@ public class PagamentoServiceTest {
         PagamentoRequestDTO requestDTO = fabricaPagamentoRequestDTO(valorPagamento);
         when(ordemServicoService.ordemServicoExiste(osId)).thenReturn(fabricaOrdemServico(StatusOS.FINALIZADO));
         when(pagamentoRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        doNothing().when(eventPublisher).publishEvent(any(PagamentoRegistradoEvento.class)); // Correção aqui
 
         PagamentoResponseDTO responseDTO = pagamentoService.registrarPagamento(osId, requestDTO);
 
         assertNotNull(responseDTO);
         assertEquals(valorPagamento, responseDTO.valor());
         verify(pagamentoRepository, times(1)).save(any(Pagamento.class));
+        verify(eventPublisher, times(1)).publishEvent(any(PagamentoRegistradoEvento.class)); // Correção aqui
     }
 
     @Test
@@ -64,6 +71,7 @@ public class PagamentoServiceTest {
         });
 
         verify(pagamentoRepository, never()).save(any());
+        verify(eventPublisher, never()).publishEvent(any(PagamentoRegistradoEvento.class)); // Correção aqui
     }
 
     private PagamentoRequestDTO fabricaPagamentoRequestDTO(BigDecimal valorPagamento) {

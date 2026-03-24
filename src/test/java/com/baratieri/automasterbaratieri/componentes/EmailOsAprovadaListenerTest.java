@@ -46,7 +46,7 @@ class EmailOsAprovadaListenerTest {
         os.setId(1L);
         os.setVeiculo(veiculoFalso);
 
-        OrdemServicoAprovadaEvento evento = new OrdemServicoAprovadaEvento(os);
+        OrdemServicoAprovadaEvento evento = new OrdemServicoAprovadaEvento(this,os);
 
         MimeMessage mimeMessageVazio = new MimeMessage((Session) null);
 

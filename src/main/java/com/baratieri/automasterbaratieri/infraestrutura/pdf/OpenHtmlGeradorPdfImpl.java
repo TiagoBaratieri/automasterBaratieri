@@ -1,5 +1,5 @@
 package com.baratieri.automasterbaratieri.infraestrutura.pdf;
-import com.baratieri.automasterbaratieri.dto.response. ReciboPagamentoResponseDTO;
+import com.baratieri.automasterbaratieri.dto.response.PagamentoResponseDTO;
 import com.baratieri.automasterbaratieri.entities.OrdemServico;
 import com.baratieri.automasterbaratieri.entities.Pagamento;
 import com.baratieri.automasterbaratieri.entities.PagamentoCartao;
@@ -8,6 +8,7 @@ import com.baratieri.automasterbaratieri.services.exceptions.RegraNegocioExcepti
 import com.baratieri.automasterbaratieri.services.interfaces.GeradorPdfService;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -23,10 +24,14 @@ public class OpenHtmlGeradorPdfImpl implements GeradorPdfService {
 
     private final TemplateEngine templateEngine;
 
+    @Value("${app.base-url}")
+    private String baseUrl;
+
     @Override
     public byte[] gerarPdfOrdemServico(OrdemServico os) {
         Context context = new Context();
         context.setVariable("os", os);
+        context.setVariable("baseUrl", baseUrl);
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             String html = templateEngine.process("ordem-servico", context);
@@ -45,14 +50,14 @@ public class OpenHtmlGeradorPdfImpl implements GeradorPdfService {
 
     @Override
     public byte[] gerarReciboPagamento(OrdemServico os, BigDecimal totalPago) {
-        List<ReciboPagamentoResponseDTO> responseDTO = os.getPagamentos().stream()
-                .map(this::toReciboPagamentoDTO)
+        List<PagamentoResponseDTO> pagamentosDTO = os.getPagamentos().stream()
+                .map(this::toPagamentoResponseDTO)
                 .collect(Collectors.toList());
 
         Context context = new Context();
         context.setVariable("os", os);
         context.setVariable("totalPago", totalPago);
-        context.setVariable("pagamentosDTO", responseDTO); // Injeta a lista de DTOs
+        context.setVariable("pagamentosDTO", pagamentosDTO);
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             String html = templateEngine.process("recibo-pagamento", context);
@@ -69,26 +74,33 @@ public class OpenHtmlGeradorPdfImpl implements GeradorPdfService {
         }
     }
 
-    private ReciboPagamentoResponseDTO toReciboPagamentoDTO(Pagamento pagamento) {
+    private PagamentoResponseDTO toPagamentoResponseDTO(Pagamento pagamento) {
         String tipoPagamento;
-        String detalhes;
+        String detalhes = "N/A";
+        BigDecimal valorRecebido = null;
+        BigDecimal troco = null;
 
         if (pagamento instanceof PagamentoCartao cartao) {
             tipoPagamento = "Cartão";
             detalhes = cartao.getNumeroParcelas() + "x de R$ " + (cartao.getValor().divide(BigDecimal.valueOf(cartao.getNumeroParcelas())));
-        } else if (pagamento instanceof PagamentoDinheiro) {
+        } else if (pagamento instanceof PagamentoDinheiro dinheiro) {
             tipoPagamento = "Dinheiro";
             detalhes = "Pagamento à vista";
+            valorRecebido = dinheiro.getValorRecebido();
+            troco = dinheiro.getTroco();
         } else {
             tipoPagamento = "Pix";
-            detalhes = "N/A";
         }
 
-        return new  ReciboPagamentoResponseDTO(
-                tipoPagamento,
+        return new PagamentoResponseDTO(
+                pagamento.getId(),
                 pagamento.getValor(),
+                pagamento.getStatusPagamento(),
+                pagamento.getDataPagamento(),
+                tipoPagamento,
                 detalhes,
-                pagamento.getDataPagamento()
+                valorRecebido,
+                troco
         );
     }
 }

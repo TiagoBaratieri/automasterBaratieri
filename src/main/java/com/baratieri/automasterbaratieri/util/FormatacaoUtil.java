@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.function.Predicate;
 
-// O Lombok cria o construtor privado automaticamente por debaixo dos panos!
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FormatacaoUtil {
 

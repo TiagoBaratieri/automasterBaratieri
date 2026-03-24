@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Orçamento Aprovado</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .icon {
+            font-size: 48px;
+            color: #28a745;
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin: 20px 0 10px;
+        }
+        p {
+            font-size: 16px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="icon">✔</div>
+    <h1>Orçamento Aprovado com Sucesso!</h1>
+    <p>A Ordem de Serviço Nº <strong th:text="${osId}">000</strong> foi aprovada.</p>
+    <p>Nossa equipe já foi notificada e daremos continuidade aos trabalhos.</p>
+</div>
+
+</body>
+</html>

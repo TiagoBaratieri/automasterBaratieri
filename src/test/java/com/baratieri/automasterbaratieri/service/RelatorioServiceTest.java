@@ -4,18 +4,16 @@ import com.baratieri.automasterbaratieri.entities.OrdemServico;
 import com.baratieri.automasterbaratieri.services.OrdemServicoService;
 import com.baratieri.automasterbaratieri.services.RelatorioService;
 import com.baratieri.automasterbaratieri.services.exceptions.RegraNegocioException;
+import com.baratieri.automasterbaratieri.services.interfaces.GeradorPdfService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,7 +23,7 @@ class RelatorioServiceTest {
     private RelatorioService relatorioService;
 
     @Mock
-    private TemplateEngine templateEngine;
+    private GeradorPdfService geradorPdf;
 
     @Mock
     private OrdemServicoService ordemServicoService;
@@ -36,41 +34,35 @@ class RelatorioServiceTest {
     @DisplayName("Deve gerar o ficheiro PDF da Ordem de Serviço com sucesso")
     void deveGerarPdfComSucesso() {
         OrdemServico osFalsa = fabricaOrdemServicoFalsa();
-        // Simula o HTML que o Thymeleaf iria gerar
-        String htmlFalso = "<html><body><h1>Recibo da Oficina</h1></body></html>";
+        byte[] pdfFalso = "Fake PDF".getBytes();
 
         when(ordemServicoService.ordemServicoExiste(osId)).thenReturn(osFalsa);
-
-        // Quando o serviço pedir ao Thymeleaf para processar, devolvemos a nossa string
-        when(templateEngine.process(eq("ordem-servico"), any(Context.class))).thenReturn(htmlFalso);
+        when(geradorPdf.gerarPdfOrdemServico(any(OrdemServico.class))).thenReturn(pdfFalso);
 
         byte[] pdfBytes = relatorioService.gerarPdfOrdemServico(osId);
 
         assertNotNull(pdfBytes);
         assertTrue(pdfBytes.length > 0, "O array de bytes do PDF não deveria estar vazio");
-
+        assertEquals(pdfFalso, pdfBytes);
 
         verify(ordemServicoService, times(1)).ordemServicoExiste(osId);
-        verify(templateEngine, times(1)).process(eq("ordem-servico"), any(Context.class));
+        verify(geradorPdf, times(1)).gerarPdfOrdemServico(osFalsa);
     }
 
     @Test
-    @DisplayName("Deve lançar RegraNegocioException quando a geração do PDF falhar")
+    @DisplayName("Deve relançar exceção quando o gerador de PDF falhar")
     void deveLancarExcecaoAoFalharGeracaoPdf() {
-
         OrdemServico osFalsa = fabricaOrdemServicoFalsa();
 
         when(ordemServicoService.ordemServicoExiste(osId)).thenReturn(osFalsa);
-
-        // Simula uma falha catastrófica no motor de templates (HTML inválido, por exemplo)
-        when(templateEngine.process(eq("ordem-servico"), any(Context.class)))
-                .thenThrow(new RuntimeException("Erro interno no motor HTML"));
+        when(geradorPdf.gerarPdfOrdemServico(any(OrdemServico.class)))
+                .thenThrow(new RegraNegocioException("Erro interno ao gerar o documento"));
 
         RegraNegocioException exception = assertThrows(RegraNegocioException.class, () -> {
             relatorioService.gerarPdfOrdemServico(osId);
         });
 
-        assertEquals("Erro ao gerar o documento PDF da Ordem de Serviço", exception.getMessage());
+        assertEquals("Erro interno ao gerar o documento", exception.getMessage());
     }
 
     private OrdemServico fabricaOrdemServicoFalsa() {

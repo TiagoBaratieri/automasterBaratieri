@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -30,6 +31,13 @@ public class OrdemServicoController {
     private final OrdemServicoService ordemServicoService;
     private final RelatorioService relatorioService;
 
+    @GetMapping("public/{id}/aprovar")
+    public ModelAndView aprovarOrdemServicoPublico(@PathVariable Long id) {
+        ordemServicoService.aprovarOrdemServico(id);
+        ModelAndView mav = new ModelAndView("aprovacao-sucesso");
+        mav.addObject("osId", id);
+        return mav;
+    }
 
     @GetMapping("/{id}/relatorio")
     public ResponseEntity<byte[]> baixarRelatorioOrdemServico(@PathVariable Long id) {
