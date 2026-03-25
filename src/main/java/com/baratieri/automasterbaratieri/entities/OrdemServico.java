@@ -265,17 +265,16 @@ public class OrdemServico {
     }
 
     private void validarSeValorNaoExcedeSaldo(Pagamento novoPagamento, BigDecimal saldoDevedor) {
-        if (!(novoPagamento instanceof PagamentoDinheiro)) {
-            if (novoPagamento.getValor().compareTo(saldoDevedor) > 0) {
-                throw new RegraNegocioException("O valor do pagamento (" + novoPagamento.getValor() +
-                        ") não pode ser maior que o saldo devedor atual (" + saldoDevedor + ").");
-            }
+        if (novoPagamento.getValor().compareTo(saldoDevedor) > 0) {
+            throw new RegraNegocioException("O valor do pagamento (" + novoPagamento.getValor() +
+                    ") não pode ser maior que o saldo devedor atual (" + saldoDevedor + ").");
         }
 
         BigDecimal saldoRestante = saldoDevedor.subtract(novoPagamento.getValor());
         if (saldoRestante.compareTo(BigDecimal.ZERO) == 0) {
             this.status = StatusOS.PAGO;
         }
+
     }
 
     @PrePersist

@@ -1,6 +1,7 @@
 package com.baratieri.automasterbaratieri.componentes;
 
 import com.baratieri.automasterbaratieri.entities.OrdemServico;
+import com.baratieri.automasterbaratieri.enums.StatusOS;
 import com.baratieri.automasterbaratieri.eventos.PagamentoRegistradoEvento;
 import com.baratieri.automasterbaratieri.services.OrdemServicoService;
 import com.baratieri.automasterbaratieri.services.RelatorioService;
@@ -33,6 +34,13 @@ public class EmailReciboPagamentoListener {
     public void enviarReciboPagamentoCliente(PagamentoRegistradoEvento evento) {
         try {
             OrdemServico ordemServico = ordemServicoService.ordemServicoExiste(evento.id());
+
+
+            if (ordemServico.getStatus() != StatusOS.PAGO) {
+                System.out.println("Pagamento parcial registado para a OS " + ordemServico.getId() + "." +
+                        " E-mail em espera até liquidação total.");
+                return;
+            }
 
             byte[] pdfRecibo = relatorioService.gerarReciboPagamento(ordemServico.getId());
 

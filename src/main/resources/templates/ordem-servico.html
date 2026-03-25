@@ -117,6 +117,19 @@
             border-radius: 5px;
             text-decoration: none;
         }
+
+        .cancel-button {
+            display: inline-block;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #dc3545; /* Vermelho padrão de alerta */
+            border-radius: 5px;
+            text-decoration: none;
+            margin-left: 15px; /* Espaço entre os dois botões */
+        }
+
     </style>
 </head>
 <body>
@@ -211,12 +224,20 @@
 
         <!-- Seção de Aprovação -->
         <div class="approval-section" th:if="${os.status.name() == 'AGUARDANDO_APROVACAO'}">
-            <h2>Aprovar Orçamento</h2>
-            <p>Para aprovar este orçamento e autorizar o início dos serviços, clique no botão abaixo.</p>
-            <a th:href="${baseUrl} + '/ordens-servico/public/' + ${os.id} + '/aprovar'"
-               class="approval-button">
-                Aprovar Orçamento
-            </a>
+            <h2>Decisão do Orçamento</h2>
+            <p>Para aprovar ou recusar este orçamento, clique em um dos botões abaixo.</p>
+
+            <div style="margin-top: 20px;">
+                <a th:href="${baseUrl} + '/ordens-servico/public/' + ${os.id} + '/aprovar'"
+                   class="approval-button">
+                    Aprovar Orçamento
+                </a>
+
+                <a th:href="${baseUrl} + '/ordens-servico/public/' + ${os.id} + '/cancelar'"
+                   class="cancel-button">
+                    Recusar Orçamento
+                </a>
+            </div>
         </div>
 
     </main>

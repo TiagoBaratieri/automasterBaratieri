@@ -39,6 +39,16 @@ public class OrdemServicoController {
         return mav;
     }
 
+
+    @GetMapping("public/{id}/cancelar")
+    public ModelAndView recusarOrdemServicoPublico(@PathVariable Long id) {
+        ordemServicoService.cancelarOrdemServico(id);
+
+        ModelAndView mav = new ModelAndView("recusado-sucesso");
+        mav.addObject("osId", id);
+        return mav;
+    }
+
     @GetMapping("/{id}/relatorio")
     public ResponseEntity<byte[]> baixarRelatorioOrdemServico(@PathVariable Long id) {
 
