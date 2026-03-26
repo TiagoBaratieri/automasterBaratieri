@@ -35,7 +35,8 @@ class PagamentoControllerTest {
     void deveRetornarCreatedQuandoRegistrarPagamento() throws Exception {
 
         when(pagamentoService.registrarPagamento(anyLong(), any()))
-                .thenReturn(new PagamentoResponseDTO(1L, new BigDecimal("150.00"), StatusPagamento.PAGO, LocalDateTime.now()));
+                .thenReturn(new PagamentoResponseDTO(1L, new BigDecimal("150.00"), StatusPagamento.PAGO, LocalDateTime.now(),
+                        null,null,null,null));
 
         String jsonPayload =jsonPayloadPagamentotoComSucesso();
 

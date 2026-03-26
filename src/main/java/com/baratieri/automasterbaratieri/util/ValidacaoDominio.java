@@ -29,7 +29,9 @@ public final class ValidacaoDominio {
 
     public static void validarValorNegativo(BigDecimal valor, String mensagemErro) {
         if (valor == null || valor.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RegraNegocioException(mensagemErro);
+            if (valor != null && valor.compareTo(BigDecimal.ZERO) < 0) {
+                throw new RegraNegocioException(mensagemErro);
+            }
         }
     }
 

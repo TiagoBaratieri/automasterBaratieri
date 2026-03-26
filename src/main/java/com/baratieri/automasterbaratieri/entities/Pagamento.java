@@ -1,6 +1,7 @@
 package com.baratieri.automasterbaratieri.entities;
 
 import com.baratieri.automasterbaratieri.enums.StatusPagamento;
+import com.baratieri.automasterbaratieri.services.exceptions.RegraNegocioException;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,6 +31,9 @@ public abstract class Pagamento {
     private OrdemServico ordemServico;
 
     public Pagamento(BigDecimal valor, OrdemServico ordemServico) {
+        validarValor(valor);
+        validarOrdemServico(ordemServico);
+
         this.valor = valor;
         this.ordemServico = ordemServico;
         this.statusPagamento = StatusPagamento.PENDENTE;
@@ -38,15 +42,27 @@ public abstract class Pagamento {
     public void confirmarPagamento() {
         validarStatusPagamento();
         if (statusPagamento == StatusPagamento.PAGO) {
-            throw new RuntimeException("Este pagamento já foi processado anteriormente.");
+            throw new RegraNegocioException("Este pagamento já foi processado anteriormente.");
         }
-        statusPagamento = StatusPagamento.PAGO;
-        dataPagamento = LocalDateTime.now();
+        this.statusPagamento = StatusPagamento.PAGO;
+        this.dataPagamento = LocalDateTime.now();
     }
 
     public void validarStatusPagamento() {
         if (statusPagamento == null) {
-            throw new RuntimeException("O status do pagamento não pode ser nulo.");
+            throw new RegraNegocioException("O status do pagamento não pode ser nulo.");
+        }
+    }
+
+    private void validarValor(BigDecimal valor) {
+        if (valor == null || valor.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RegraNegocioException("O valor do pagamento deve ser maior que zero.");
+        }
+    }
+
+    private void validarOrdemServico(OrdemServico ordemServico) {
+        if (ordemServico == null) {
+            throw new RegraNegocioException("A ordem de serviço é obrigatória para o pagamento.");
         }
     }
 }
